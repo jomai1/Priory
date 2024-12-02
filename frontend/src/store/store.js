@@ -2,15 +2,23 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 
 export const taskStore = defineStore('tasks', {
-	state: () => ({ tasks: [{}] }),
+	state: () => ({ tasks: [], completeTask: [{}] }),
   getters: {
     allTasks: (state) => {
     	return state.tasks
     },
+    topThreeTasks: (state) => {
+      if (state.tasks.length >= 3) {
+        return state.tasks.slice(0, 3);  
+      }else{
+        return state.tasks.slice(0, state.tasks.length);  
+      }
+      
+    },
     allCategories: (state) => {
     	var categories = []
     	for (var i = 0; i < state.tasks.length; i++) {
-    		if(state.tasks[i].categories){
+    		if(state.tasks[i]?.categories){
     			for (var j = 0; j < state.tasks[i].categories.length; j++) {
     				categories.push(state.tasks[i].categories[j])
     			}	
@@ -23,11 +31,12 @@ export const taskStore = defineStore('tasks', {
     },
   },
   actions: {
-    async getTasks(){
+    async getTasks(typeTask){
       try{
         const tasks_req = await axios({
           method: "get",
           url: `http://localhost:${3001}/tasks/v1/all-tasks`,
+          params: {type: typeTask}
         })  
 
         this.tasks = await tasks_req.data
@@ -51,6 +60,34 @@ export const taskStore = defineStore('tasks', {
 
       return true
     },
+    async deleteTask(taskID){
+      try{
+        const tasks_req = await axios({
+          method: 'post',
+          url: `http://localhost:${3001}/tasks/v1/delete`,
+          data: {id: taskID}
+        })
+
+      }catch (error) {
+        return false
+      }
+
+      return true
+    },
+    async completeTask(taskID){
+      try{
+        const tasks_req = await axios({
+          method: 'post',
+          url: `http://localhost:${3001}/tasks/v1/complete`,
+          data: {id: taskID}
+        })
+
+      }catch (error) {
+        return false
+      }
+
+      return true
+    }
 
   },
 

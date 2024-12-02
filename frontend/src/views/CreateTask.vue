@@ -1,6 +1,11 @@
 <template>
-  <div class="input-container">
-    <div class="selectable">
+  <div class="container">
+    <div class="header">
+        <h2>Create ToDo</h2>
+        <button class="close-btn" @click="router.push('/')">✖</button>
+    </div>
+
+    <div class="action-block">
       <label class="input-label" for="title">Chose a title:
         <input 
           class="input-field" 
@@ -11,65 +16,83 @@
       </label>
     </div>
 
-    <div class="selectable">
-      <label paceholder="Description" class="input-label" for="title">Write a description:
-        <textarea 
-          class="input-field" 
-          type="text" 
-          id="description" 
-          v-model="description">
-        </textarea>
-      </label>
-    </div>
-
-    <div class="selectable">
+    <div class="action-block">
       
     </div>
 
-    <div class="add-btn-container">
+    <div 
+     class="add-btn-container"
+    >
       <button
+        class="btn add-btn"
         @click="openSelectablePopup()"
-      >+</button>
+      >➕</button>
+    </div>
+
+    <div
+      class="submit-btn-container"
+    >
+      <button
+        class="btn"
+        @click="submitTask()"
+      >
+        submit
+      </button>  
     </div>
   </div>
 
-  <div>
-    <button
-      class="submit-button"
-      @click="submitTask()"
-    >
-      submit
-    </button>  
-  </div>
+  
+
+  <SelectablePopup
+    :visible = "togglePopup"
+    @close-popup="closeSelectablePopup()"
+  />  
+  
   
 </template>
 
 <script setup>
+  import SelectablePopup from '../components/SelectablePopup.vue';
+
   import { useRouter, useRoute } from 'vue-router'
   import {taskStore} from "../store/store.js";
+  import { ref } from "vue";
+
 
   const router = useRouter()
   const route = useRoute()
   const store = taskStore()
 
-  var title, description
 
-  function openSelectablePopup(){
-    console.log("Open the popup!")
+  // Sentiment analysis
+  import Sentiment from "sentiment"
+
+  function analyzeSentiment(title) {
+    const sentiment = new Sentiment();
+    const result = sentiment.analyze(title);
+
+    console.log(result)
+    return result.score;
   }
 
 
+  var togglePopup = ref(false);
+
+  function openSelectablePopup(){
+    togglePopup.value = true
+  }
+
+  function closeSelectablePopup(){
+    togglePopup.value = false
+  }
+
+
+  var title
+  
   async function submitTask(){
-    console.log(title)
-    console.log(description)
-
-
-
-
     const newTask = {
       title: title,
-      description: description,
-      // Needs to be changed to current category
+      sentimentScore: analyzeSentiment(title),
       categories: route?.query?.category != undefined ? [route.query.category]: ['All'] 
     }
 
@@ -88,11 +111,12 @@
 </script>
 
 <style>
-  
+
 .input-label {
   display: flex;
   flex-direction: column;
   width: 100%;
+  color: gray;
 }
 
 input[type=text], input[type=datetime-local], input[type=number], input[type=radio] {
@@ -105,80 +129,13 @@ input[type=text], input[type=datetime-local], input[type=number], input[type=rad
   box-sizing: border-box;
 }
 
-textarea {
-  width: 100%;
-  padding: 12px 20px;
-  margin: 8px 0;
-  display: inline-block;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-.submit-button {
-  appearance: button;
-  background-color: #1899D6;
-  border: solid transparent;
-  border-radius: 16px;
-  border-width: 0 0 4px;
-  box-sizing: border-box;
-  color: #FFFFFF;
-  cursor: pointer;
-  display: inline-block;
-  font-family: din-round,sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: .8px;
-  line-height: 20px;
-  margin: 0;
-  margin-top: 20px;
-  margin-bottom: 50px;
-  outline: none;
-  overflow: visible;
-  padding: 13px 16px;
+.add-btn-container{
+  margin: 25px 0 0 0;
   text-align: center;
-  text-transform: uppercase;
-  touch-action: manipulation;
-  transform: translateZ(0);
-  transition: filter .2s;
-  user-select: none;
-  -webkit-user-select: none;
-  vertical-align: middle;
-  white-space: nowrap;
 }
 
-.submit-button:after {
-  background-clip: padding-box;
-  background-color: #1CB0F6;
-  border: solid transparent;
-  border-radius: 16px;
-  border-width: 0 0 4px;
-  bottom: -4px;
-  content: "";
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  z-index: -1;
-}
-
-.submit-button:main,
-.submit-button:focus {
-  user-select: auto;
-}
-
-.submit-button:hover:not(:disabled) {
-  filter: brightness(1.1);
-  -webkit-filter: brightness(1.1);
-}
-
-.submit-button:disabled {
-  cursor: auto;
-}
-
-.submit-button:active {
-  border-width: 4px 0 0;
-  background: none;
+.submit-btn-container{
+  text-align: right;
 }
 
 </style>
