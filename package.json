@@ -1,10 +1,19 @@
 {
+  "name": "priory",
   "type": "module",
+  "scripts": {
+    "dev": "nodemon app.js"
+  },
   "dependencies": {
+    "axios": "^1.7.9",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "gsap": "^3.12.5",
+    "mongodb": "^6.12.0",
+    "mongoose": "^8.9.0",
     "nodemon": "^3.1.9",
+    "sentiment": "^5.0.2",
     "uuid": "^11.0.3"
   }
 }
