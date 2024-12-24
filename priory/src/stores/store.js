@@ -52,11 +52,13 @@ export const taskStore = defineStore('tasks', {
       return (category, limit = 3) => {
         console.log(category)
 
-        if(category == 'All') return state.tasks.filter(task => task.status == 'active').slice(0, limit);
+        if(category == "Today") return state.tasks.filter(task => task.status == 'active').reverse().slice(0, 3);
+        if(category == 'All') return state.tasks.filter(task => task.status == 'active').slice(0, limit).reverse();
         return state.tasks
           .filter(task => task.categories.includes(category)) // Check if task includes the category
           .filter(task => task.status == 'active')
-          .slice(0, limit);
+          .slice(0, limit)
+          .reverse();
       };
     },
   },
@@ -90,13 +92,16 @@ export const taskStore = defineStore('tasks', {
       }
     },
     async updateTask(updatedTask) {
-      var data = JSON.parse(JSON.stringify(updatedTask))
+      const backup = [...this.tasks];
+      this.tasks = this.tasks.filter(t => t._id !== taskID);
+
+
 
       try{
         const tasks_req = await axios({
           method: 'post',
           url: `http://localhost:${3001}/api/v1/updateTask`,
-          data
+          data: JSON.parse(JSON.stringify(updatedTask))
         })
 
         return tasks_req.success

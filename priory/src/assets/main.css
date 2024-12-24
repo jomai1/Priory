@@ -65,7 +65,7 @@ a,
   padding: 13px 16px;
   text-align: center;
   text-transform: uppercase;
-  touch-action: manipulation;
+  touch-delete-complete: manipulation;
   transform: translateZ(0);
   transition: filter .2s;
   user-select: none;
@@ -108,8 +108,27 @@ a,
   background: none;
 }
 
+
+.edit-btn{
+  background-color: #5CA9E6;
+  color: #FFFFFF;
+  padding: 8px 15px;
+  margin-bottom: 0px;
+  margin-top: 0px;
+}
+
+.edit-btn:after {
+  background-color: #76B3E5;
+}
+
+.edit-btn:hover:not(:disabled) {
+  background-color: #5CA9E6;
+  filter: brightness(1.05);
+  -webkit-filter: brightness(1.05);
+}
+
 .add-btn{
-  background-color: #b3e6b3;
+  background-color: #A8D5BA;
   color: #FFFFFF;
   padding: 8px 15px;
   margin-bottom: 0px;
@@ -117,17 +136,35 @@ a,
 }
 
 .add-btn:after {
-  background-color: #d9f2d9;
+  background-color: #C3E5CF;
 }
 
 .add-btn:hover:not(:disabled) {
-  background-color: #9CCC65;
+  background-color: #A8D5BA;
+  filter: brightness(1.05);
+  -webkit-filter: brightness(1.05);
+}
+
+.complete-btn{
+  background-color: #66BB6A;
+  color: #FFFFFF;
+  padding: 8px 15px;
+  margin-bottom: 0px;
+  margin-top: 0px;
+}
+
+.complete-btn:after {
+  background-color: #81C784;
+}
+
+.complete-btn:hover:not(:disabled) {
+  background-color: #66BB6A;
   filter: brightness(1.05);
   -webkit-filter: brightness(1.05);
 }
 
 .delete-btn{
-  background-color: #EF7A70;
+  background-color: #E58B8B;
   color: #FFFFFF;
   padding: 8px 15px;
   margin-bottom: 0px;
@@ -135,11 +172,11 @@ a,
 }
 
 .delete-btn:after {
-  background-color: #F49695;
+  background-color: #F4A3A3;
 }
 
 .delete-btn:hover:not(:disabled) {
-  background-color: #EE706E;
+  background-color: #E58B8B;
   filter: brightness(1.1);
   -webkit-filter: brightness(1.1);
 }
@@ -171,7 +208,7 @@ a,
   background: none;
 }
 
-.action-block{
+.delete-complete-block{
   margin-bottom: 10px;
 }
 

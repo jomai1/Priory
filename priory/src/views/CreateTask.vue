@@ -5,7 +5,7 @@
         <button class="close-btn" @click="router.push('/')">✖</button>
     </div>
 
-    <div class="action-block">
+    <div class="delete-complete--block">
       <label class="input-label" for="title">Chose a title:
         <input 
           class="input-field" 

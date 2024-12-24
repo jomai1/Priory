@@ -33,7 +33,7 @@
       <div  v-for="task in allTasks" :key="task._id">
         <div 
           class="task-container"
-          @click="openTask(task)"
+          @click="currentTask?._id != task._id? currentTask = task: currentTask = {}; currentEditedTask = 0"
           @mouseover.stop.prevent="hoverOverTask(task)"
           >
             <div
@@ -45,43 +45,62 @@
 
             <div
               v-if="currentTask?._id == task._id"
-              
             >
+
+              <div class="edit-tasks"
+                v-if="currentTask?._id == task._id"
+              >
+                  <button 
+                    class="btn edit-btn"
+                    @click.prevent.stop="() => {currentEditedTask != task._id? currentEditedTask = task._id: currentEditedTask = 0}"
+                  >edit</button>  
+              </div>
+              <div class="spacer"></div>
+              
               <SelectableBlockContainer
                 :selectables = "currentTask.ticketBlocks"
               />
-              {{task}}
+
+              <div
+                v-if="currentEditedTask == task._id"
+              >
+                {{task}}  
+              </div>
+              
 
               <div 
+               v-if="currentEditedTask == task._id"
                class="add-btn-container"
+               
               >
                 <button
                   class="btn add-btn"
                   @click.prevent.stop="() => {togglePopup = true}"
                 >➕</button>
               </div>
-            </div>
+            
 
             <div class="spacer"></div>
-            <div 
-                class="action-tasks"
-                @click.prevent.stop
-                >
-                <button
-                  v-if="currentHoverOverTask?._id == task._id"
-                  class="delete-btn btn task-delete" @click="deleteTask(task)"
-                 >
-                  ✖
-                </button>
-                <button 
-                  v-if="currentHoverOverTask?._id == task._id"
-                  class="add-btn btn" @click="completeTask(task)"
-                  @mousedown="startComplete"
-                  @mouseleave="stopComplete"
-                 >
-                  ✔
-                </button>
-              </div>
+
+          </div>
+          <div 
+              class="delete-complete-tasks"
+              @click.prevent.stop
+              >
+              <button
+                v-if="currentHoverOverTask?._id == task._id && currentEditedTask == task._id"
+                class="delete-btn btn task-delete" @click="deleteTask(task)"
+               >
+                ✖
+              </button>
+              <button 
+                class="complete-btn btn" @click="completeTask(task)"
+                @mousedown="startComplete"
+                @mouseleave="stopComplete"
+               >
+                ✔
+              </button>
+          </div>
         </div>
       </div>
     </div>
@@ -117,6 +136,7 @@
   var togglePopup = ref(false);
   var currentTask = ref({});
   var currentHoverOverTask = ref({});
+  var currentEditedTask = ref(0);
 
 
   // Score animation (Would like to understand better)
@@ -161,23 +181,12 @@
     currentCategoryIndex.value = (currentCategoryIndex.value + 1) % store.allCategories.length
   }
 
+
   function hoverOverTask(task){
     if(!task){
       currentHoverOverTask.value = {}  
     }else{
       currentHoverOverTask.value = task  
-    }
-    
-  }
-
-  function openTask(task){
-
-    console.log(task)
-
-    if(currentTask.value?._id != task._id){
-      currentTask.value = task
-    }else{
-      currentTask.value = {}
     }
   }
 
@@ -248,8 +257,8 @@
 
   .task-container{
     border: 1px solid #E0E0E0;
-    margin: 10px 0 10px 0;
-    padding: 10px 10px 15px 10px;
+    margin: 10px 0 10px 10px;
+    padding: 20px 25px 20px 25px;
     border-radius: 4px;
     background-color: #F5F5F5;
     cursor: pointer;
@@ -263,15 +272,7 @@
   .spacer {
     margin-right: 0px;
     width: 10px;
-    height: 30px;
-  }
-
-  .action-tasks {
-    display: inline;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    margin: 10px;
+    height: 40px;
   }
 
   .task-delete{
@@ -290,10 +291,18 @@
     position: relative;
   }
 
-
-
-  .action-tasks{
-    display:inline;
+  .edit-tasks{
+    display: inline;
+    position: absolute;
     right: 0;
+    margin: 0px 10px 0px 0px;
+  }
+
+  .delete-complete-tasks {
+    display: inline;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin: 10px;
   }
 </style>
