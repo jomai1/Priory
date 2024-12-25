@@ -5,7 +5,7 @@
         <button class="close-btn" @click="router.push('/')">✖</button>
     </div>
 
-    <div class="delete-complete--block">
+    <div class="delete-complete-block">
       <label class="input-label" for="title">Chose a title:
         <input 
           class="input-field" 
@@ -30,7 +30,7 @@
     </div>
 
     <div
-      class="submit-btn-container"
+      class="footer"
     >
       <button
         class="btn"
@@ -132,10 +132,6 @@ input[type=text], input[type=datetime-local], input[type=number], input[type=rad
 .add-btn-container{
   margin: 25px 0 0 0;
   text-align: center;
-}
-
-.submit-btn-container{
-  text-align: right;
 }
 
 </style>
