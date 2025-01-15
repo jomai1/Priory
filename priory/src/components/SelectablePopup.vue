@@ -3,14 +3,28 @@
         <div class="popup">
             <div class="header">
                 <h2>Select Icons</h2>
-                <button class="close-btn" @click="$emit('closePopup', {})">✖</button>
+                <button class="close-btn" @click="$emit('closePopup', {})">
+                    ✖
+                </button>
             </div>
-            <div class="categories">
-                <div v-for="(groupOfSelectable, category) in selectables" class="category-container">
-                    <h3 class="category-title">{{category}}</h3>
+            <div class="selectables-categories">
+                <div
+                    v-for="(groupOfSelectable, category) in selectables"
+                    class="selectables-category-container"
+                >
+                    <h3 class="selectables-category-title">{{ category }}</h3>
                     <div class="selectable-grid">
-                        <div v-for="selectable in groupOfSelectable" :key="selectable.title" class="selectable" @click="submitSelectable(selectable)">
-                            <img :src="selectable.image" alt="selectable preview" class="selectable-image" />
+                        <div
+                            v-for="selectable in groupOfSelectable"
+                            :key="selectable.title"
+                            class="selectable"
+                            @click="submitSelectable(selectable)"
+                        >
+                            <img
+                                :src="selectable.image"
+                                alt="selectable preview"
+                                class="selectable-image"
+                            />
                             <div class="selectable-details">
                                 <h5>{{ selectable.title }}</h5>
                                 <p>{{ selectable.description }}</p>
@@ -23,40 +37,83 @@
     </div>
 </template>
 <script setup>
-const emit = defineEmits(['closePopup'])
+const emit = defineEmits(["closePopup"]);
 
 const props = defineProps({
-    visible: Boolean
-})
-
+    visible: Boolean,
+});
 
 const selectables = {
     "Basic Blocks": [
-        { title: "Description", image: "/text.png", description: "Add a Description Block", placeholder: "Enter a description", blockType: 'text-block', value: { text: '' } },
+        {
+            title: "Description",
+            image: "/text.png",
+            description: "Add a Description Block",
+            placeholder: "Enter a description",
+            blockType: "text-block",
+            value: { text: "" },
+        },
         // { title: "Image", image: "/image.png", description: "Add a Image" },
-        { title: "Todo List", image: "/todo_list.png", description: "Add a Todo List", placeholder: "Enter todo title, hit enter", blockType: 'todo-list-block', value: { todos: [] } },
+        {
+            title: "Todo List",
+            image: "/todo_list.png",
+            description: "Add a Todo List",
+            placeholder: "Enter todo title, hit enter",
+            blockType: "todo-list-block",
+            value: { todos: [] },
+        },
         // { title: "Embedded URL", image: "/todo_list.png", description: "Add a Embedded URL" },
-    ]
-    // ,
-    // "Classification System": [
-    //   { title: "Eisenhower Matrix", image: "/matrix.png", description: "Prioritize using the Eisenhower Matrix" },
-    //   { title: "Traffic Lights", image: "/traffic_lights.png", description: "Prioritize using red, yellow, or green labels" },
-    // ],
-    // "Execution System": [
-    //   { title: "Pomodoro", image: "/pomodoro.png", description: "Add Pomodoro timer" },
-    //   { title: "Time Tracking", image: "/time_tracking.png", description: "Track time of the exectution" },
-    // ],
-    // "Scheduling": [
-    //   { title: "Time Blocking", image: "/time_blocking.png", description: "Schedule Time Blocking" },
-    //   { title: "Due Date", image: "/due_date.png", description: "Schedule using a single Due Date" },
-    //   { title: "Daily Activity Schdule", image: "/time_blocking.png", description: "Schedule using a daily Activity Schdule" },
-    // ],
-}
+    ],
+    "Classification System": [
+        {
+            title: "Traffic Light Priority",
+            image: "/traffic_lights.png",
+            description: "Prioritize using red, yellow, or green labels",
+            placeholder: "Select low, mid, or high priority",
+            blockType: "traffic-light-block",
+            value: { prio: "" },
+        },
+        {
+            title: "Eisenhower Matrix",
+            image: "/matrix.png",
+            description: "Prioritize using the Eisenhower Matrix",
+        }
+    ],
+    "Execution System": [
+        {
+            title: "Pomodoro",
+            image: "/pomodoro.png",
+            description: "Add Pomodoro timer",
+        },
+        {
+            title: "Time Tracking",
+            image: "/time_tracking.png",
+            description: "Track time of the exectution",
+        },
+    ],
+    Scheduling: [
+        {
+            title: "Time Blocking",
+            image: "/time_blocking.png",
+            description: "Schedule Time Blocking",
+        },
+        {
+            title: "Due Date",
+            image: "/due_date.png",
+            description: "Schedule using a single Due Date",
+        },
+        {
+            title: "Daily Activity Schdule",
+            image: "/time_blocking.png",
+            description: "Schedule using a daily Activity Schdule",
+        },
+    ],
+};
 
 function submitSelectable(selected) {
     // emit selectedComp
 
-    emit('closePopup', selected)
+    emit("closePopup", selected);
 }
 </script>
 <style>
@@ -73,7 +130,6 @@ function submitSelectable(selected) {
     align-items: center;
     z-index: 1000;
     animation: fadeIn 0.3s ease-out;
-
 }
 
 .popup {
@@ -88,7 +144,9 @@ function submitSelectable(selected) {
     /* Enable scrolling if content exceeds height */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     padding: 20px;
-    animation: fadeIn 0.3s ease-out, slideUp 0.3s ease-out;
+    animation:
+        fadeIn 0.3s ease-out,
+        slideUp 0.3s ease-out;
 }
 
 .popup-content {
@@ -98,15 +156,11 @@ function submitSelectable(selected) {
     /* Scroll content if necessary */
 }
 
-.category-container {
+.selectables-category-container {
     margin: 15px 0 25px 5px;
 }
 
-.category {
-    margin-bottom: 20px;
-}
-
-.category-title {
+.selectables-category-title {
     font-size: 18px;
     margin-bottom: 10px;
     color: gray;
@@ -126,7 +180,9 @@ function submitSelectable(selected) {
     padding: 10px;
     text-align: center;
     background: #f9f9f9;
-    transition: transform 0.2s, border 0.2s;
+    transition:
+        transform 0.2s,
+        border 0.2s;
 }
 
 .selectable:hover {

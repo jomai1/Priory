@@ -2,13 +2,25 @@
     <div class="container">
         <div class="header">
             <h2>Create ToDo</h2>
-            <button class="close-btn" @click="router.push('/')">✖</button>
+            <button class="close-btn" @click="closeCreateTask()">✖</button>
         </div>
-        <div class="delete-complete-block">
+        <div class="action-block">
             <label class="input-label" for="title">Chose a title:
-                <input class="input-field" placeholder="Enter a title" type="text" id="title" v-model="title">
+                <input class="input-field" placeholder="Enter a title" type="text" id="title" v-model="title" ref="titleInputField">
             </label>
         </div>
+
+        <div class="action-block">
+            <CategoryInput
+                :edit = "true"
+                :categories = "categories"
+                @remove-category="removeCategory"
+                @add-category="addCategory"
+            />
+        </div>
+
+        {{ticketBlocks}}
+
         <SelectableBlockContainer :selectables="ticketBlocks" />
         <div class="add-btn-container">
             <button class="btn add-btn" @click="() => {togglePopup = true}">➕</button>
@@ -24,17 +36,20 @@
 <script setup>
 import SelectablePopup from '../components/SelectablePopup.vue';
 import SelectableBlockContainer from '../components/SelectableBlockContainer.vue';
+import CategoryInput from '../components/CategoryInput.vue';
 
 import { useRouter, useRoute } from 'vue-router'
 import { taskStore } from "../stores/store.js";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
-const router = useRouter()
-const route = useRoute()
-const store = taskStore()
+const router = useRouter();
+const route = useRoute();
+const store = taskStore();
 
+const titleInputField = ref(null)
 var togglePopup = ref(false);
 var title
+var categories = ref(route?.query?.category != undefined ? [route.query.category] : [])
 var ticketBlocks = ref([]);
 
 // prio score the system assigned
@@ -43,42 +58,53 @@ var prioScoreSystem = ref(0);
 // prio score the user assigned
 var prioScore = ref(0);
 
+function addCategory(category){
+    categories.value.push(category)
+}
 
-
-function closeSelectablePopup(selectable) {
-    ticketBlocks.value.push(selectable)
-
-    togglePopup.value = false
+function removeCategory(index){
+    categories.value.splice(index, 1);
 }
 
 
+function closeCreateTask(){
+    router.push({path: '/', query: {category: categories.value[0]} })
+}
+
+function closeSelectablePopup(selectable) {
+    ticketBlocks.value.push(selectable)
+    togglePopup.value = false
+}
 
 async function submitTask() {
-    if (route ? .query ? .category != undefined) {
-
-    }
 
     const newTask = {
         title: title,
-        ticketBlocks: ticketBlocks.value,
+        ticketBlocks: JSON.parse(JSON.stringify(ticketBlocks.value)),
 
         // Sentiment analysis
         prioScoreSystem: prioScoreSystem.value,
         prioScore: prioScore.value,
-        categories: route ? .query ? .category != undefined ? [route.query.category] : []
+        categories: JSON.parse(JSON.stringify(categories.value)),
     }
 
     const answer = await store.createTask(newTask)
 
+    console.log("Created")
     console.log(newTask)
 
     if (answer) {
-        router.push('/')
+        router.push({path: '/', query: {category: categories.value[0]} })
     } else {
         console.log(`${newTask}`)
     }
 
 }
+
+onMounted(async () => {
+    titleInputField.value.focus()
+})
+
 </script>
 <style>
 .input-label {

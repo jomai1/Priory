@@ -2,20 +2,19 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 
 export const taskStore = defineStore('tasks', {
-    state: () => ({ tasks: [] }),
+    state: () => ({ tasks: [], taskModified: false }),
     getters: {
+
+        // TODO!
         // returns the higher bound index of priority level
         prioIndexes: (state) => {
-
-            console.log("Hel")
             if (state.tasks.length > 0 && state.tasks[0]) {
                 state.tasks[4].prioScore = 11
 
             }
-            console.log("lo")
-
+            
             // sorting needed because endpoint does not save in right place!
-            var tmpTasks = state.tasks ? .slice().sort((a, b) => (b.prioScore || 0) - (a.prioScore || 0));
+            var tmpTasks = state.tasks?.slice().sort((a, b) => (b.prioScore || 0) - (a.prioScore || 0));
 
 
             // w = p·G100 
@@ -27,17 +26,12 @@ export const taskStore = defineStore('tasks', {
                 archivable: Math.round(tmpTasks.length / 100 * 95)
             }
 
-
-            console.log(tmpTasks)
-            console.log(tmpTasks.length)
-            console.log(prioities)
-
             return tmpTasks
         },
         allCategories: (state) => {
-            var categories = ['Today', 'All']
+            var categories = []
             for (var i = 0; i < state.tasks.length; i++) {
-                if (state.tasks[i] ? .categories) {
+                if (state.tasks[i]?.categories && state.tasks[i]?.status == 'active') {
                     for (var j = 0; j < state.tasks[i].categories.length; j++) {
                         categories.push(state.tasks[i].categories[j])
                     }
@@ -48,17 +42,22 @@ export const taskStore = defineStore('tasks', {
 
             return uniqueArray
         },
-        allTasks: (state) => {
-            return (category, limit = 3) => {
-                console.log(category)
-
-                if (category == "Today") return state.tasks.filter(task => task.status == 'active').reverse().slice(0, 3);
-                if (category == 'All') return state.tasks.filter(task => task.status == 'active').slice(0, limit).reverse();
+        getTaskByIndex: (state) => {
+            return (category, index) => {
                 return state.tasks
-                    .filter(task => task.categories.includes(category)) // Check if task includes the category
-                    .filter(task => task.status == 'active')
-                    .slice(0, limit)
-                    .reverse();
+                    .filter(task => task.categories.includes(category))[index];
+            }
+        },
+        allTasksLength: (state) => {
+            return (category) => {
+                return state.tasks
+                    .filter(task => task.categories.includes(category)).length
+            }
+        },
+        allTasks: (state) => {
+            return (category) => {
+                return state.tasks
+                    .filter(task => task.categories.includes(category))
             };
         },
     },
@@ -94,11 +93,6 @@ export const taskStore = defineStore('tasks', {
 
         async updateTask(taskID, payload) {
             const backup = [...this.tasks];
-            this.tasks = this.tasks.filter(t => t._id !== taskID);
-
-            console.log(payload)
-
-            console.log("Update task")
 
             try {
                 const tasks_req = await axios({
@@ -110,13 +104,15 @@ export const taskStore = defineStore('tasks', {
                     }
                 })
 
-                console.log(tasks_req)
+                // if(tasks_req.success){
+                //     this.tasks[taskID].ticketBlocks = JSON.parse(JSON.stringify(payload))
+                // }
+
+                this.taskModified = false
 
                 return tasks_req.success
 
             } catch (error) {
-
-
                 this.tasks = backup
                 return false
             }

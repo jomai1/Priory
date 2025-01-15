@@ -21,7 +21,7 @@ router.get('/task', async (req, res) => {
 	} 
 
 	try{
-		const task = await Task.findById(req.query._id)
+		const task = await Task.findOne({ _id: req.query._id, status: "active" });
 
 		if (!task){
 			answer.message = "Task not found"

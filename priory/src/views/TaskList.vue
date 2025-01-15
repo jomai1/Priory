@@ -1,38 +1,58 @@
 <template>
     <div class="container" @mouseover="hoverOverTask(false)">
-        <div class="header-container">
-            <div class="header">
-                <div></div>
-                <div>
-                    <div @click="changeCategory" class="category-container">
-                        <h2>{{ store.allCategories[currentCategoryIndex] }}</h2>
-                    </div>
-                </div>
-                <div>
-                    <button class="btn add-btn" @click="
-              router.push({
-                path: '/create',
-                query: { category: store.allCategories[currentCategoryIndex] },
-              })
-            ">
-                        ➕
-                    </button>
-                </div>
+        <div class="header">
+            <div @click="uiStore.iterateCategoryIndex(store.allCategories)" class="category-container">
+                <h2>{{ uiStore.getUiState.category }}</h2>
             </div>
-            <div class="score-container">
-                <p class="score">{{ tweened.score.toFixed(0) }}</p>
-            </div>
+            <button
+                class="btn add-btn add-task-button"
+                @click="
+                    router.push({
+                        path: '/create',
+                        query: {
+                            category: uiStore.getUiState.category,
+                        },
+                    })
+                "
+            >
+                ➕
+            </button>
         </div>
-        <div v-for="task in allTasks" :key="task._id" @mouseover.stop.prevent="hoverOverTask(task)">
-            <TaskPreview :task="task" :ctrlTaskObj="ctrlTaskObj" @add-to-score="addToScore" />
+        <!--       <div class="score-container">
+                <p class="score">{{ tweened.score.toFixed(0) }}</p>
+            </div> -->
+        <div v-if="allTasks.length == 0" class="delete-category-container">
+            <button
+                class="btn delete-btn"
+                @click="
+                    () => {
+                        console.log(
+                            `Delete '${uiStore.getUiState.category}'`,
+                        );
+                    }
+                "
+            >
+                Delete this category
+            </button>
+        </div>
+
+        <div
+            v-for="task in allTasks"
+            :key="task._id"
+            @mouseover.stop.prevent="hoverOverTask(task)"
+        >
+            <TaskPreview
+                :task="task"
+                @add-to-score="addToScore"
+            />
         </div>
     </div>
 </template>
 <script setup>
-import { onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { taskStore } from "../stores/store.js";
-import { ref, reactive, watch, computed } from "vue";
+import { useUiStore } from "../stores/uiStore";
+import { ref, reactive, watch, computed, onMounted, onBeforeMount } from "vue";
 
 // watcher animation/ score animation
 import gsap from "gsap";
@@ -40,14 +60,10 @@ import gsap from "gsap";
 import TaskPreview from "../components/TaskPreview.vue";
 
 const router = useRouter();
+const route = useRoute();
 const store = taskStore();
+const uiStore = useUiStore();
 
-var currentCategoryIndex = ref(0);
-var ctrlTaskObj = ref({
-    currentTask: {},
-    hoverID: 0,
-    editID: 0,
-});
 
 // Score animation (Would like to understand better)
 const score = ref(0);
@@ -62,27 +78,60 @@ function addToScore(score) {
 }
 
 function changeCategory() {
-    currentCategoryIndex.value =
-        (currentCategoryIndex.value + 1) % store.allCategories.length;
+    uiStore.iterateCategoryIndex(uiStore.getUiState.category)
 }
 
 function hoverOverTask(task) {
     if (!task) {
-        ctrlTaskObj.value.hoverID = 0;
+        uiStore.hoverOver(0)
     } else {
-        ctrlTaskObj.value.hoverID = task._id;
+        uiStore.hoverOver(task._id)
+    }
+
+    
+}
+
+function onKeyUp(e) {
+    if (e.key == "p" && event.ctrlKey) {
+        router.push({
+            path: "/create",
+            query: { category: uiStore.getUiState.category },
+        });
     }
 }
 
 // Filtered tasks by category and paging.
-const currentCategory = computed(
-    () => store.allCategories[currentCategoryIndex.value],
-);
-const allTasks = computed(() => store.allTasks(currentCategory.value, 50));
+const allTasks = computed(() => {
+    if(!uiStore.ui.category) {
+        return []
+    }else{
+
+        router.replace({path: '/', query: {category: uiStore.ui.category} })
+        return store.allTasks(uiStore.ui.category, 50)
+    }
+
+    
+});
 
 // Populate store with tasks
 onMounted(async () => {
     await store.getTasks();
+
+    // Change category to category defined in query category
+    if (route?.query?.category) {
+        uiStore.changeCategory(store.allCategories, route.query.category)
+    }else{
+        uiStore.initCategory(store.allCategories)
+    }
+
+
+    // Add event listener to create new task with 'p' + ctrlKey press
+    document.addEventListener("keyup", onKeyUp);
+});
+
+onBeforeMount(() => {
+    // Remove event listener to create new task with 'p' + ctrlKey press
+    document.removeEventListener("keyup", onKeyUp);
 });
 
 watch(score, (n) => {
@@ -92,13 +141,30 @@ watch(score, (n) => {
 <style>
 .category-container {
     cursor: pointer;
+    flex: 1;
+    text-align: center;
+}
+
+.category-container > h2 {
+    margin: 0;
+}
+
+.add-task-button {
+    margin-left: auto;
+}
+
+.add-task-button {
+    align-self: flex-end;
+}
+
+.delete-category-container {
+    text-align: center;
 }
 
 .score-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 1px;
 }
 
 .score {
@@ -113,7 +179,6 @@ watch(score, (n) => {
 }
 
 @keyframes pulse {
-
     0%,
     100% {
         transform: scale(1);

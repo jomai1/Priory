@@ -32,14 +32,12 @@ a,
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
-  color: gray;
 }
 
 .container{
   background-color: #F9F9F9;
   padding: 20px;
   border-radius: 4px;
-  color: grey;
 }
 
 .footer {
@@ -47,8 +45,10 @@ a,
   justify-content: end;
   align-items: center;
   margin-bottom: 10px;
+  margin-top: 10px;
   color: gray;
 }
+
 
 .btn {
   appearance: button;
@@ -73,7 +73,6 @@ a,
   padding: 13px 16px;
   text-align: center;
   text-transform: uppercase;
-  touch-delete-complete: manipulation;
   transform: translateZ(0);
   transition: filter .2s;
   user-select: none;
@@ -216,8 +215,21 @@ a,
   background: none;
 }
 
-.delete-complete-block{
-  margin-bottom: 10px;
+.action-block{
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #d3d3d3;
+  border-radius: 3px;
+  margin-top: 4px;
+}
+
+hr.solid-divider {
+  border: none;
+  border-top: 2px solid #d3d3d3;
+  border-radius: 5px;
+  height: 0;
+  margin: 20px 0;
+  width: 100%;
 }
 
 textarea {

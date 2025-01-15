@@ -15,7 +15,9 @@ router.get('/tasks', async (req, res) => {
 
 	try{
 		// Todo: Change endpoint to account for pagination (Pagination & Filtering)
-		const tasks = await Task.find({}).limit(100);
+		const tasks = await Task.find({ status: "active" }).sort({ createdAt: -1, prioScore: -1});
+		
+		console.log(tasks)
 
 		answer.success = true;
 		// Probably unnecessary, but not sure if Task.find is an empty array if the collection is empty.
