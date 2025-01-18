@@ -1,14 +1,5 @@
 <template>
     <label class="input-label" for="title">{{buildingBlock.title}}
-        
-
-        <!-- {{buildingBlock}} -->
-        <br>
-        Length: {{store.allTasksLength(uiStore.getUiState.category)}} <br>
-        Thumb position {{thumbPosition}} <br>
-
-
-
         <div class="traffic-light-wrapper">
             
             <div class="traffic-light-color-picker">
@@ -30,7 +21,7 @@
 
                     ref="slider"
                 >   
-                    <div class="traffic-light-slider-thumb" :style="{ top: Math.min(Math.max(thumbPosition - (25 / 2), 0), maxSlider - 25)   + 'px'}"></div>
+                    <div class="traffic-light-slider-thumb" :style="{ top: Math.min(Math.max(thumbPosition - (20 / 2), 0), maxSlider - 20)   + 'px'}"></div>
                 </div>
                 <div class="traffic-light-color-input">
                     <div class="traffic-light-color-block traffic-light-color-block-red"
@@ -54,7 +45,7 @@
 <script setup>    
 import { taskStore } from "../../stores/store.js";
 import { useUiStore } from "../../stores/uiStore";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 
 const store = taskStore();
 const uiStore = useUiStore();
@@ -115,21 +106,39 @@ function trafficLightSliderClick(e){
 
 function interpolateIndexFromPosition(pos){
     const index = Math.round(0 + ((pos - 0) * (store.allTasksLength(uiStore.getUiState.category) - 1 - 0)) / (maxSlider - 0));
-
-    console.log(index)
-    return index
+    return index;
 }
+
+watch(thumbPosition, async (newPosition, oldPosition) => {
+
+    if(Math.round(newPosition) != Math.round(oldPosition)){
+        if(uiStore.getUiState.currentTask._id){
+            uiStore.setEdit(uiStore.getUiState.currentTask._id)
+            
+            // Get priority score of index
+            const priorityScoreAtIndex = store.getTaskPriorityByIndex(interpolateIndexFromPosition(newPosition))
+
+            if(priorityScoreAtIndex != -1){
+                if(store.setTaskPriority(uiStore.getUiState.currentTask._id, uiStore.getUiState.category, priorityScoreAtIndex + 1, interpolateIndexFromPosition(newPosition))){
+                    
+                    uiStore.setEdit(uiStore.getUiState.currentTask._id)
+                }
+            }
+
+            // 
+            
+        }
+    }
+})
+
 
 
 onMounted(() => {
     const ticketTitleLength = 30;
 
-    // Todo: change for priority sorted index!
     taskNamesPriority.value.highPrioTask = store.getTaskByIndex(uiStore.getUiState.category, interpolateIndexFromPosition(0)).title.substring(0,ticketTitleLength);
     taskNamesPriority.value.midPrioTask = store.getTaskByIndex(uiStore.getUiState.category, interpolateIndexFromPosition(midSilder)).title.substring(0,ticketTitleLength);
     taskNamesPriority.value.lowPrioTask = store.getTaskByIndex(uiStore.getUiState.category, interpolateIndexFromPosition(lowSlider)).title.substring(0,ticketTitleLength);
-
-    console.log(taskNamesPriority.value)
 })
 
 </script>

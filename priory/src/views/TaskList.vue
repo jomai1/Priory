@@ -1,7 +1,10 @@
 <template>
     <div class="container" @mouseover="hoverOverTask(false)">
         <div class="header">
-            <div @click="uiStore.iterateCategoryIndex(store.allCategories)" class="category-container">
+            <div
+                @click="uiStore.iterateCategoryIndex(store.allCategories)"
+                class="category-container"
+            >
                 <h2>{{ uiStore.getUiState.category }}</h2>
             </div>
             <button
@@ -26,9 +29,7 @@
                 class="btn delete-btn"
                 @click="
                     () => {
-                        console.log(
-                            `Delete '${uiStore.getUiState.category}'`,
-                        );
+                        console.log(`Delete '${uiStore.getUiState.category}'`);
                     }
                 "
             >
@@ -37,39 +38,49 @@
         </div>
 
         <div
-            v-for="task in allTasks"
-            :key="task._id"
+            v-for="(task, index) in allTasks"
+            :key="task._id + index"
             @mouseover.stop.prevent="hoverOverTask(task)"
+            :ref="setTaskRef"
         >
-            <TaskPreview
-                :task="task"
-                @add-to-score="addToScore"
-            />
+            <TaskPreview :task="task" @add-to-score="addToScore" />
         </div>
     </div>
 </template>
 <script setup>
+// Vue
+import { ref, reactive, watch, computed, onMounted, onBeforeMount } from "vue";
 import { useRouter, useRoute } from "vue-router";
+
+// Components
+import TaskPreview from "../components/TaskPreview.vue";
+
+// Store
 import { taskStore } from "../stores/store.js";
 import { useUiStore } from "../stores/uiStore";
-import { ref, reactive, watch, computed, onMounted, onBeforeMount } from "vue";
 
+// external Dependencies
 // watcher animation/ score animation
 import gsap from "gsap";
-
-import TaskPreview from "../components/TaskPreview.vue";
 
 const router = useRouter();
 const route = useRoute();
 const store = taskStore();
 const uiStore = useUiStore();
 
-
 // Score animation (Would like to understand better)
 const score = ref(0);
 const tweened = reactive({
     score: 0,
 });
+
+const taskRefs = ref([]);
+
+function setTaskRef(el, index) {
+    if (el) {
+        taskRefs.value[index] = el;
+    }
+}
 
 function addToScore(score) {
     console.log(`Add ${score} to score`);
@@ -78,17 +89,15 @@ function addToScore(score) {
 }
 
 function changeCategory() {
-    uiStore.iterateCategoryIndex(uiStore.getUiState.category)
+    uiStore.iterateCategoryIndex(uiStore.getUiState.category);
 }
 
 function hoverOverTask(task) {
     if (!task) {
-        uiStore.hoverOver(0)
+        uiStore.hoverOver(0);
     } else {
-        uiStore.hoverOver(task._id)
+        uiStore.hoverOver(task._id);
     }
-
-    
 }
 
 function onKeyUp(e) {
@@ -102,15 +111,12 @@ function onKeyUp(e) {
 
 // Filtered tasks by category and paging.
 const allTasks = computed(() => {
-    if(!uiStore.ui.category) {
-        return []
-    }else{
-
-        router.replace({path: '/', query: {category: uiStore.ui.category} })
-        return store.allTasks(uiStore.ui.category, 50)
+    if (!uiStore.ui.category) {
+        return [];
+    } else {
+        router.replace({ path: "/", query: { category: uiStore.ui.category } });
+        return store.allTasks(uiStore.ui.category, 50);
     }
-
-    
 });
 
 // Populate store with tasks
@@ -119,11 +125,10 @@ onMounted(async () => {
 
     // Change category to category defined in query category
     if (route?.query?.category) {
-        uiStore.changeCategory(store.allCategories, route.query.category)
-    }else{
-        uiStore.initCategory(store.allCategories)
+        uiStore.changeCategory(store.allCategories, route.query.category);
+    } else {
+        uiStore.initCategory(store.allCategories);
     }
-
 
     // Add event listener to create new task with 'p' + ctrlKey press
     document.addEventListener("keyup", onKeyUp);

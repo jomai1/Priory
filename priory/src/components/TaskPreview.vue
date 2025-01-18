@@ -1,10 +1,12 @@
 <template>
     <div
         class="container task-preview"
+        @mousedown="uiStore.onMouseDown"
+        @mouseup="uiStore.onMouseUp"
         @click="
             uiStore.getUiState.currentTask?._id != task._id
-                ? (uiStore.getUiState.currentTask = task)
-                : (uiStore.getUiState.currentTask = {});
+                ? uiStore.changeTask(task)
+                : uiStore.changeTask({});
             uiStore.setEdit(0);
         "
     >
@@ -20,7 +22,7 @@
                 @click.prevent.stop="
                     () => {
                         uiStore.getUiState.editID != task._id
-                            ? (uiStore.getUiState.editID = task._id)
+                            ? uiStore.setEdit(task._id)
                             : uiStore.setEdit(0);
                     }
                 "
@@ -45,6 +47,7 @@
             v-if="uiStore.getUiState.currentTask._id == task._id"
             @click.prevent.stop
         >
+
             <CategoryInput
                 :edit="uiStore.getUiState.editID == task._id"
                 :categories="task.categories"
@@ -52,7 +55,7 @@
                 @add-category="addCategory"
             />
 
-            {{ task }}
+            <!-- {{ task }} -->
 
             <SelectableBlockContainer :selectables="task.ticketBlocks" />
             <div
@@ -77,13 +80,13 @@
                 v-if="uiStore.getUiState.hoverID == task._id"
             >
                 <button
-                    v-if="uiStore.getUiState.editID == task._id"
+                    v-show="uiStore.getUiState.editID == task._id"
                     class="btn edit-btn button-space"
                     @click.prevent.stop="
                         () => {
                             saveTask();
                             uiStore.getUiState.editID != task._id
-                                ? (uiStore.getUiState.editID = task._id)
+                                ? (uiStore.setEdit(task._id))
                                 : uiStore.setEdit(0);
                         }
                     "
@@ -91,7 +94,7 @@
                     save
                 </button>
                 <button
-                    v-if="uiStore.getUiState.editID != task._id"
+                    v-show="uiStore.getUiState.editID != task._id"
                     class="delete-btn btn button-space"
                     @click.prevent.stop="
                         () => {
@@ -103,7 +106,7 @@
                 </button>
 
                 <button
-                    v-if="uiStore.getUiState.editID != task._id"
+                    v-show="uiStore.getUiState.editID != task._id"
                     class="complete-btn btn button-space"
                     @click.prevent.stop="
                         () => {
@@ -122,12 +125,17 @@
     />
 </template>
 <script setup>
+// Vue
 import { ref } from "vue";
-import { taskStore } from "../stores/store.js";
-import { useUiStore } from "../stores/uiStore";
+
+// Components
 import SelectableBlockContainer from "../components/SelectableBlockContainer.vue";
 import SelectablePopup from "../components/SelectablePopup.vue";
 import CategoryInput from "../components/CategoryInput.vue";
+
+// Store
+import { taskStore } from "../stores/store.js";
+import { useUiStore } from "../stores/uiStore";
 
 const store = taskStore();
 const uiStore = useUiStore();
@@ -136,20 +144,23 @@ const emit = defineEmits(["addToScore"]);
 
 const props = defineProps({
     task: {},
-    edit: false,
 });
 
 var togglePopup = ref(false);
 
 async function saveTask() {
-    console.log(`Save = ${store.taskModified}`)
+    // TODO update all tasks of this category.
 
-    if(store.taskModified){
+
+    // TODO: only works for categories! It is nesessary to build a payload!
+    if (store.taskModified) {
+        // if only one task was modified, only modify this one!
+
         const answer = await store.updateTask(props.task._id, {
             categories: JSON.parse(JSON.stringify(props.task.categories)),
         });
 
-        if (answer) emit("addToScore", 1);   
+        if (answer) emit("addToScore", 1);
     }
 
     uiStore.changeTask(props.task);
@@ -157,15 +168,17 @@ async function saveTask() {
 
 async function addCategory(category) {
     store.taskModified = true;
-    
-    var tmpTask = props.task.categories;
-    tmpTask.push(category);
+
+    console.log(category)
+    //asdf
+
+    props.task.categories.push(category);
 }
 
-function removeCategory(index) {
+function removeCategory(category) {
     store.taskModified = true;
 
-    console.log(`add ${index}`)
+    const index = props.task.categories.findIndex((cat) => cat == category);
 
     var tmpTask = props.task.categories;
     tmpTask.splice(index, 1);

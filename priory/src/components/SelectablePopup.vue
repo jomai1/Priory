@@ -62,6 +62,14 @@ const selectables = {
             blockType: "todo-list-block",
             value: { todos: [] },
         },
+        {
+            title: "Table",
+            image: "/table.png",
+            description: "Add a Table",
+            placeholder: "Enter Table columns and rows.",
+            blockType: "table-block",
+            value: { table: [] },
+        },
         // { title: "Embedded URL", image: "/todo_list.png", description: "Add a Embedded URL" },
     ],
     "Classification System": [

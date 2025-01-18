@@ -1,33 +1,9 @@
-import { defineStore } from 'pinia'
-import axios from 'axios'
+import { defineStore } from 'pinia';
+import axios from 'axios';
 
 export const taskStore = defineStore('tasks', {
-    state: () => ({ tasks: [], taskModified: false }),
+    state: () => ({ tasks: [], taskModified: false, tasksModified: {}}),
     getters: {
-
-        // TODO!
-        // returns the higher bound index of priority level
-        prioIndexes: (state) => {
-            if (state.tasks.length > 0 && state.tasks[0]) {
-                state.tasks[4].prioScore = 11
-
-            }
-            
-            // sorting needed because endpoint does not save in right place!
-            var tmpTasks = state.tasks?.slice().sort((a, b) => (b.prioScore || 0) - (a.prioScore || 0));
-
-
-            // w = p·G100 
-            // Math.round(2.5);
-            var prioities = {
-                high: Math.round(tmpTasks.length / 100 * 10),
-                medium: Math.round(tmpTasks.length / 100 * 60),
-                low: Math.round(tmpTasks.length / 100 * 80),
-                archivable: Math.round(tmpTasks.length / 100 * 95)
-            }
-
-            return tmpTasks
-        },
         allCategories: (state) => {
             var categories = []
             for (var i = 0; i < state.tasks.length; i++) {
@@ -60,8 +36,37 @@ export const taskStore = defineStore('tasks', {
                     .filter(task => task.categories.includes(category))
             };
         },
+        getTaskPriorityByIndex: (state) => {
+            return (index) => {
+                if(index < 0  || index >= state.tasks.length) return -1;
+                return state.tasks[index].prioScore;
+            }
+        }
     },
     actions: {
+        setTaskPriority(taskID, category, newPriority, newIndex){
+
+            // find task with taskID
+            const index = this.tasks.findIndex(({ _id }) => _id === taskID);
+            if(index == -1) return false;
+
+            this.tasks[index].prioScore = newPriority;
+
+            let tasks = this.tasks.filter(task => task.categories.includes(category))
+            
+            // this needs to be opimized!
+            for(var i = newIndex; i >= 0; i--){
+                const currentLocalTask = tasks[i];
+                const indexInDataset = this.tasks.findIndex(item => item._id === currentLocalTask._id);
+
+                if (indexInDataset !== -1 && taskID != currentLocalTask._id) {
+                    this.tasks[indexInDataset].newPriority = currentLocalTask.prioScore + newPriority;
+                }
+            }
+
+            return true;
+
+        },
         async createTask(newTask) {
             var data = JSON.parse(JSON.stringify(newTask))
 
@@ -90,9 +95,34 @@ export const taskStore = defineStore('tasks', {
                 console.log(error.response);
             }
         },
+        async updateTasks() {
+            // TODO: needs to get ids and key, values of changed elements for bulk update
+            const backup = [...this.tasks];
 
+            try {
+                const tasks_req = await axios({
+                    method: 'post',
+                    url: `http://localhost:${3001}/api/v1/updateTasks`,
+                    data: {
+                        payload: JSON.parse(JSON.stringify(payload))
+                    }
+                })
+
+                this.taskModified = false
+
+                return tasks_req.success
+
+            } catch (error) {
+                this.tasks = backup
+                return false
+            }
+
+        },
         async updateTask(taskID, payload) {
             const backup = [...this.tasks];
+
+            // check if tasks modified flag was set!
+            if(!this.taskModified) return false;
 
             try {
                 const tasks_req = await axios({
@@ -116,7 +146,6 @@ export const taskStore = defineStore('tasks', {
                 this.tasks = backup
                 return false
             }
-
         },
         async deleteTask(taskID) {
             // Optimistic update

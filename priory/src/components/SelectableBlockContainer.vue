@@ -1,6 +1,8 @@
 <template>
-    <div v-for="(buildingBlock, index) in selectables" @click.stop>
+    <div v-for="(buildingBlock, index) in selectables" @click.prevent.stop>
         <!-- div block that check for the type using v-if and render the desired building block! -->
+
+        <hr v-if="index != 0" class="solid-divider" />
 
         <div
             v-if="buildingBlock.blockType == 'text-block'"
@@ -9,12 +11,10 @@
             <label class="input-label" for="title"
                 >{{ buildingBlock.title }}:
                 <textarea
-                    class="input-field"
-                    :placeholder="buildingBlock.placeholder"
-                    type="text"
-                    id="title"
-                    v-model="buildingBlock.value.text"
-                ></textarea>
+                    v-model="buildingBlock.value.text" editorStyle="height: 320px" class="input-field" id="title"
+                >
+                    
+                </textarea>
             </label>
         </div>
 
@@ -88,7 +88,7 @@
             v-if="buildingBlock.blockType == 'traffic-light-block'"
             class="action-block"
         >
-            <TrafficLight :buildingBlock="buildingBlock" />
+            <TrafficLight :buildingBlock="buildingBlock"/>
         </div>
     </div>
 </template>
@@ -98,9 +98,11 @@ import { v4 as uuidv4 } from "uuid";
 
 import TrafficLight from "../components/buildingBlocks/TrafficLight.vue";
 
+
 const props = defineProps({
     selectables: Array,
 });
+
 
 var todoTmp = ref("");
 var mouseOverElement = ref("");

@@ -1,94 +1,153 @@
 <template>
-    <label class="input-label" for="category">{{edit ? 'Enter Categories': '' }}
+	<label class="input-label" for="category"
+		>{{ edit ? "Enter Categories:" : "Categories:" }}
 		<div class="category-input">
 			<div class="categories">
 				<span
-					v-for="(category, index) in categories"
+					v-for="(category, index) in allCategories"
 					:key="index"
-					class="category category-added"
-					:class="{categoryAdded: edit}"
-					@click="() => {
-						if(edit) removeCategory(index)
-					}"
-				>
+					class="category"
+					@click="() => {if(edit) toggleCategory(category)}"
+					:class="{categoryInactive: !categories.includes(category), categoryAdded: categories.includes(category), categoryAddedHover: (edit && categories.includes(category))}"
+				>	
 					{{ category }}
 				</span>
-			</div>
-
-			<hr class="solid-divider" v-if="edit">
-			<div class="categories" v-if="edit">
-
 				<span
-					v-for="(category, index) in furtherCategories"
-					:key="index"
-					class="category category-inactive"
-					@click="addCategory(category)"
+					v-if="edit && !isAddingCategory"
+					class="category-input-field btn add-btn"
+					@click="startAddingCategory"
 				>
-					{{ category }}
+					➕
 				</span>
+				<input
+				v-if="edit && isAddingCategory"
+				v-model="newCategory"
+	      class="category-input-field input"
+	      @blur="addCategory"
+	      @keyup.enter="addCategory(newCategory)"
+	      placeholder="New category..."
+	      ref="categoryInput"
+			/>
 			</div>
 
-			<input
-				v-if="edit"
-				type="text"
-				class="category-input-field"
-				v-model="newCategory"
-				@keyup.enter="
-					addCategory(newCategory);
-					newCategory = '';
-				"
-				placeholder="Add a category ..."
-			/>
+			
+
 		</div>
-    </label>
+	</label>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, nextTick } from "vue";
 
 import { taskStore } from "../stores/store.js";
 const store = taskStore();
 
 const emit = defineEmits(["removeCategory", "addCategory"]);
 const props = defineProps({
-	categories: {},
-	edit: true,
+	categories: Array,
+	edit: false,
 });
 
-var newCategory = ref("");
-var furtherCategories = ref([]);
+const newCategory = ref("");
+const categoryInput = ref("");
+const allCategories = ref([]);
+const isAddingCategory = ref(false);
 
-function addCategory(newCategory) {
+
+
+
+function toggleCategory(category){
+	console.log(category)
+
+	if(props.categories.includes(category)){
+		emit("removeCategory", category);
+	}else{
+		emit("addCategory", category);
+	}
+}
+
+async function startAddingCategory(){
+	isAddingCategory.value = true;
+	
+	await nextTick(() => {
+		if (categoryInput.value) categoryInput.value.focus();
+		const container = categoryInput.value.closest('.categories');
+    container.scrollLeft = container.scrollWidth; 
+	});
+};	
+
+async function addCategory(newCategory){
 	const trimmedCategory = newCategory.trim();
 
 	if (trimmedCategory && !props.categories.includes(trimmedCategory)) {
 		emit("addCategory", trimmedCategory);
+		categoryInput.value = '';
+
+
+		await nextTick(() => {
+			const container = categoryInput.value.closest('.categories');
+		  container.scrollLeft = 0;
+		});
 	}
+
+	isAddingCategory.value = false;
 }
 
-function removeCategory(index) {
-	emit("removeCategory", index);
+function prioritizeSubset(parentArray, subsetArray) {
+  const subsetSet = new Set(subsetArray);
+
+  return parentArray.sort((a, b) => {
+    const aInSubset = subsetSet.has(a);
+    const bInSubset = subsetSet.has(b);
+
+    if (aInSubset && bInSubset) return 0;
+    if (!aInSubset && !bInSubset) return 0;
+
+    return aInSubset ? -1 : 1;
+  });
 }
 
-watch(props.categories, () => {
 
-	console.log("store.allCategories")
-	console.log(store.allCategories)
-
-	furtherCategories.value = store.allCategories.filter(
-		(el) => !props.categories.includes(el),
-	);
+watch(() => props.edit, () => {
+	if(props.edit){
+		allCategories.value = store.allCategories
+		
+		prioritizeSubset(allCategories.value, props.categories)
+	}else{
+		allCategories.value = props.categories
+	}
 });
 
+watch(() => props.categories, () => {
+	if(props.edit){
+		allCategories.value = store.allCategories
+		
+		prioritizeSubset(allCategories.value, props.categories)
+	}else{
+		allCategories.value = props.categories
+	}
+},
+	{ deep: true }
+);
+
+
 onMounted(async () => {
-	await store.getTasks();
-	furtherCategories.value = store.allCategories.filter(
-		(el) => !props.categories.includes(el),
-	);
+	console.log("On mount")
+	if(props.edit){
+		allCategories.value = store.allCategories
+
+		prioritizeSubset(allCategories.value, props.categories)
+	}else{
+		allCategories.value = props.categories
+	}
 });
 </script>
 
 <style>
+.hidden {
+	visibility: hidden;
+}
+
 .category-input {
 	flex-wrap: wrap;
 	gap: 8px;
@@ -97,41 +156,58 @@ onMounted(async () => {
 .categories {
 	margin: 3px 0px 3px 0px;
 	display: flex;
-	flex-wrap: wrap;
 	gap: 8px;
+	overflow-x: auto;
+	white-space: nowrap;
+	:hover{
+
+	}
 }
 
 .category {
 	font-family: "Arial", "Helvetica", sans-serif;
 	color: #676767;
 	align-items: center;
-	margin: 0px 10px 0px 0px;
+	margin: 0px 10px 10px 0px;
 	padding: 5px 10px;
 	border-radius: 3px;
 	font-size: 14px;
 	text-align: right;
 }
 
-.category-added {
-	background-color: #c3e5cf;
+.categoryAdded {
+	background-color: #c3e5cf;	
 }
 
-.categoryAdded:hover {
+.categoryAddedHover:hover {
 	background-color: #e5c6c3;
 }
 
-.category-inactive {
+.categoryInactive {
 	background-color: #f2f2f2;
 }
 
-.category-inactive:hover {
+.categoryInactive:hover {
 	background-color: #c3e5cf;
 }
 
-.category-input-field {
-	border: none;
+.category-input-field{
+	font-family: "Arial", "Helvetica", sans-serif;
+	color: #676767;
+	align-items: center;
+	margin: 0px 10px 10px 0px;
+	padding: 5px 10px;
+	font-size: 14px;	
+}
+
+.category-input-field:focus {
 	outline: none;
-	padding: 5px 8px;
-	font-size: 14px;
+}
+
+.input {
+  border: 1px solid #ccc;
+  border-radius: 16px;
+  padding: 8px 12px;
+  width: auto;
 }
 </style>
