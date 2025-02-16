@@ -96,8 +96,9 @@
                 <button
                     v-show="uiStore.getUiState.editID != task._id"
                     class="delete-btn btn button-space"
+                    :class="{'actionPending':flaggedForDeletion}"
                     @click.prevent.stop="
-                        () => {
+                        () => { 
                             deleteTask(task);
                         }
                     "
@@ -108,6 +109,7 @@
                 <button
                     v-show="uiStore.getUiState.editID != task._id"
                     class="complete-btn btn button-space"
+                    :class="{'actionPending':flaggedForCompletion}"
                     @click.prevent.stop="
                         () => {
                             completeTask(task);
@@ -147,6 +149,9 @@ const props = defineProps({
 });
 
 var togglePopup = ref(false);
+
+var flaggedForDeletion = ref(false);
+var flaggedForCompletion = ref(false);
 
 async function saveTask() {
     // TODO update all tasks of this category.
@@ -205,17 +210,30 @@ async function closeSelectablePopup(selectable) {
 }
 
 async function deleteTask(task) {
-    const answer = await store.deleteTask(task._id);
+    flaggedForDeletion.value = !flaggedForDeletion.value;
 
-    console.log(answer);
-
-    if (answer) emit("addToScore", 5);
+    if(flaggedForDeletion.value){
+        setTimeout(async () => {
+            if(flaggedForDeletion.value){
+                const answer = await store.deleteTask(task._id);
+                if (answer) emit("addToScore", 5);
+            }
+        }, 1100);
+    }
 }
 
-async function completeTask(task) {
-    const answer = await store.completeTask(task._id);
 
-    if (answer) emit("addToScore", 20);
+async function completeTask(task) {
+    flaggedForCompletion.value = !flaggedForCompletion.value;
+
+    if(flaggedForCompletion.value){
+        setTimeout(async () => {
+            if(flaggedForCompletion.value){
+                const answer = await store.completeTask(task._id);
+                if (answer) emit("addToScore", 20);
+            }
+        }, 700);
+    }
 }
 </script>
 <style>
@@ -238,6 +256,26 @@ input[type="radio"] {
     border-radius: 4px;
     box-sizing: border-box;
 }
+
+.actionPending{
+    transition: 0.6s;
+    filter: brightness(0.9);
+    -webkit-filter: brightness(0.9);
+}
+
+.actionPending:after{
+    transition: 0.6s;
+    filter: brightness(0.9);
+    -webkit-filter: brightness(0.9);
+}
+
+.actionPending:hover:not(:disabled) {
+    transition: 0.6s;
+    filter: brightness(0.8);
+    -webkit-filter: brightness(0.8);
+}
+
+
 
 .add-btn-container {
     margin: 25px 0 0 0;

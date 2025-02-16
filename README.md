@@ -1,6 +1,20 @@
 # Priory
 
 
+# Calculate Priority
+Change index of ticket. Then update the priority score (update all?).
+
+
+## Events
+# Record drag event in uiStore
+Note the “Drag” event and do not allow the subsequent click event
+```js
+  @mousedown="uiStore.onMouseDown"
+  @mouseup="uiStore.onMouseUp"
+  @click="uiStore.someFN" // someFN needs to check if isDragging is set!
+```
+
+
 
 ## Thoughts about task data structure
 
