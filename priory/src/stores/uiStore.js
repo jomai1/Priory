@@ -45,7 +45,16 @@ export const useUiStore = defineStore("uiStore", {
                 (el) => el == category,
             );
         },
-        iterateCategoryIndex(categories){
+        decreaseCategoryIndex(categories){
+            this.ui.categoryIndex = (this.ui.categoryIndex) % categories.length  - 1;
+
+            if(this.ui.categoryIndex < 0){
+                this.ui.categoryIndex = categories.length - 1;
+            }
+
+            this.ui.category = categories[this.ui.categoryIndex]
+        },
+        increaseCategoryIndex(categories){
             this.ui.categoryIndex = (this.ui.categoryIndex + 1) % categories.length;
             this.ui.category = categories[this.ui.categoryIndex]
         },

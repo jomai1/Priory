@@ -1,14 +1,25 @@
 <template>
     <div class="container" @mouseover="hoverOverTask(false)">
         <div class="header">
+            <div style="visibility: hidden" class="btn add-btn">➕</div>
             <div
-                @click="uiStore.iterateCategoryIndex(store.allCategories)"
                 class="category-container"
             >
-                <h2>{{ uiStore.getUiState.category }}</h2>
+                <button
+                    class="btn switch-category-btn"
+                    @click="uiStore.decreaseCategoryIndex(store.allCategories)"
+                ><</button>
+                <h2
+                    @click="uiStore.increaseCategoryIndex(store.allCategories)"
+                >{{ uiStore.getUiState.category }}</h2>
+                <button
+                    class="btn switch-category-btn"
+                    @click="uiStore.increaseCategoryIndex(store.allCategories)"
+                >></button>
             </div>
+
             <button
-                class="btn add-btn add-task-button"
+                class="btn add-btn"
                 @click="
                     router.push({
                         path: '/create',
@@ -148,19 +159,21 @@ watch(score, (n) => {
     cursor: pointer;
     flex: 1;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px
 }
 
-.category-container > h2 {
+.category-container h2 {
+    width: 150px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     margin: 0;
 }
 
-.add-task-button {
-    margin-left: auto;
-}
-
-.add-task-button {
-    align-self: flex-end;
-}
 
 .delete-category-container {
     text-align: center;

@@ -55,7 +55,7 @@
                 @add-category="addCategory"
             />
 
-            <!-- {{ task }} -->
+            {{ task }}
 
             <SelectableBlockContainer :selectables="task.ticketBlocks" />
             <div
@@ -128,7 +128,7 @@
 </template>
 <script setup>
 // Vue
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 // Components
 import SelectableBlockContainer from "../components/SelectableBlockContainer.vue";
@@ -147,6 +147,7 @@ const emit = defineEmits(["addToScore"]);
 const props = defineProps({
     task: {},
 });
+
 
 var togglePopup = ref(false);
 
@@ -235,6 +236,7 @@ async function completeTask(task) {
         }, 700);
     }
 }
+
 </script>
 <style>
 .input-label {
