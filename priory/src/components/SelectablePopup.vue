@@ -37,6 +37,8 @@
     </div>
 </template>
 <script setup>
+import { v4 as uuidv4 } from "uuid";
+
 const emit = defineEmits(["closePopup"]);
 
 const props = defineProps({
@@ -51,7 +53,7 @@ const selectables = {
             description: "Add a Description Block",
             placeholder: "Enter a description",
             blockType: "text-block",
-            value: { text: "" },
+            value: "",
         },
         // { title: "Image", image: "/image.png", description: "Add a Image" },
         {
@@ -60,7 +62,7 @@ const selectables = {
             description: "Add a Todo List",
             placeholder: "Enter todo title, hit enter",
             blockType: "todo-list-block",
-            value: { todos: [] },
+            value: [],
         },
         {
             title: "Table",
@@ -68,7 +70,7 @@ const selectables = {
             description: "Add a Table",
             placeholder: "Enter Table columns and rows.",
             blockType: "table-block",
-            value: { table: [] },
+            value: [],
         },
         // { title: "Embedded URL", image: "/todo_list.png", description: "Add a Embedded URL" },
     ],
@@ -79,7 +81,7 @@ const selectables = {
             description: "Prioritize using red, yellow, or green labels",
             placeholder: "Select low, mid, or high priority",
             blockType: "traffic-light-block",
-            value: { prio: "" },
+            value: -1,
         },
         {
             title: "Eisenhower Matrix",
@@ -119,8 +121,11 @@ const selectables = {
 };
 
 function submitSelectable(selected) {
-    // emit selectedComp
+        
+    // add unique ID for later query.
+    selected._id = uuidv4();
 
+    // emit selectedComp
     emit("closePopup", selected);
 }
 </script>

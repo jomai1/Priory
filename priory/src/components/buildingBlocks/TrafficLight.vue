@@ -43,11 +43,11 @@
 </template>
 
 <script setup>    
-import { taskStore } from "../../stores/store.js";
+import { useTaskStore } from "../../stores/store.js";
 import { useUiStore } from "../../stores/uiStore";
 import { ref, onMounted, watch } from "vue";
 
-const store = taskStore();
+const store = useTaskStore();
 const uiStore = useUiStore();
 
 const props = defineProps({

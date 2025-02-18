@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
 
-export const taskStore = defineStore('tasks', {
+export const useTaskStore = defineStore('tasks', {
     state: () => ({ tasks: [], taskModified: false, tasksModified: {}}),
     getters: {
         allCategories: (state) => {
@@ -134,11 +134,53 @@ export const taskStore = defineStore('tasks', {
                     }
                 })
 
-                // if(tasks_req.success){
-                //     this.tasks[taskID].ticketBlocks = JSON.parse(JSON.stringify(payload))
-                // }
+
+
+                if(tasks_req.data.success){
+                    for (var i = 0; i < this.tasks.length; i++) {
+                        if(this.tasks._id == taskID){
+                            this.tasks[i].ticketBlocks = JSON.parse(JSON.stringify(payload))
+                        }
+                    }
+                }
+                
 
                 this.taskModified = false
+
+                return tasks_req.success
+
+            } catch (error) {
+                this.tasks = backup
+                return false
+            }
+        },
+        async updateSelectableBlock(taskID, selectableID, payload){
+            const backup = [...this.tasks];
+
+            try {
+                const tasks_req = await axios({
+                    method: 'post',
+                    url: `http://localhost:${3001}/api/v1/updateSelectableBlock`,
+                    data: {
+                        _id: taskID,
+                        selectableID: selectableID,
+                        payload: JSON.parse(JSON.stringify(payload))
+                    }
+                })
+
+                // Update local block 
+                if(tasks_req.data.success){
+                    for (var i = 0; i < this.tasks.length; i++) {
+                        if(this.tasks[i]._id == taskID){
+                            for (var j = 0; j < this.tasks[i].ticketBlocks.length; j++) {
+                                if(this.tasks[i].ticketBlocks[j]._id == selectableID){
+                                    this.tasks[i].ticketBlocks[j].value = payload        
+                                }
+                            }  
+                        }
+                    }
+
+                }
 
                 return tasks_req.success
 

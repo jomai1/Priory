@@ -39,12 +39,12 @@ import SelectableBlockContainer from '../components/SelectableBlockContainer.vue
 import CategoryInput from '../components/CategoryInput.vue';
 
 import { useRouter, useRoute } from 'vue-router'
-import { taskStore } from "../stores/store.js";
+import { useTaskStore } from "../stores/store.js";
 import { ref, onMounted } from "vue";
 
 const router = useRouter();
 const route = useRoute();
-const store = taskStore();
+const store = useTaskStore();
 
 const titleInputField = ref(null)
 var togglePopup = ref(false);
@@ -111,20 +111,6 @@ onMounted(async () => {
     display: flex;
     flex-direction: column;
     width: 100%;
-    color: gray;
-}
-
-input[type=text],
-input[type=datetime-local],
-input[type=number],
-input[type=radio] {
-    width: 100%;
-    padding: 12px 20px;
-    margin: 8px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
 }
 
 .add-btn-container {

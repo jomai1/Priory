@@ -67,7 +67,7 @@ import { useRouter, useRoute } from "vue-router";
 import TaskPreview from "../components/TaskPreview.vue";
 
 // Store
-import { taskStore } from "../stores/store.js";
+import { useTaskStore } from "../stores/store.js";
 import { useUiStore } from "../stores/uiStore";
 
 // external Dependencies
@@ -76,7 +76,7 @@ import gsap from "gsap";
 
 const router = useRouter();
 const route = useRoute();
-const store = taskStore();
+const store = useTaskStore();
 const uiStore = useUiStore();
 
 // Score animation (Would like to understand better)
@@ -189,7 +189,6 @@ watch(score, (n) => {
     font-family: "Poppins", sans-serif;
     font-size: 2rem;
     font-weight: 400;
-    color: #d9f2d9;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     /* Add a cool shadow effect */
     animation: pulse 2s infinite ease-in-out;

@@ -47,7 +47,6 @@
             v-if="uiStore.getUiState.currentTask._id == task._id"
             @click.prevent.stop
         >
-
             <CategoryInput
                 :edit="uiStore.getUiState.editID == task._id"
                 :categories="task.categories"
@@ -86,7 +85,7 @@
                         () => {
                             saveTask();
                             uiStore.getUiState.editID != task._id
-                                ? (uiStore.setEdit(task._id))
+                                ? uiStore.setEdit(task._id)
                                 : uiStore.setEdit(0);
                         }
                     "
@@ -96,9 +95,9 @@
                 <button
                     v-show="uiStore.getUiState.editID != task._id"
                     class="delete-btn btn button-space"
-                    :class="{'actionPending':flaggedForDeletion}"
+                    :class="{ actionPending: flaggedForDeletion }"
                     @click.prevent.stop="
-                        () => { 
+                        () => {
                             deleteTask(task);
                         }
                     "
@@ -109,7 +108,7 @@
                 <button
                     v-show="uiStore.getUiState.editID != task._id"
                     class="complete-btn btn button-space"
-                    :class="{'actionPending':flaggedForCompletion}"
+                    :class="{ actionPending: flaggedForCompletion }"
                     @click.prevent.stop="
                         () => {
                             completeTask(task);
@@ -136,10 +135,10 @@ import SelectablePopup from "../components/SelectablePopup.vue";
 import CategoryInput from "../components/CategoryInput.vue";
 
 // Store
-import { taskStore } from "../stores/store.js";
+import { useTaskStore } from "../stores/store.js";
 import { useUiStore } from "../stores/uiStore";
 
-const store = taskStore();
+const store = useTaskStore();
 const uiStore = useUiStore();
 
 const emit = defineEmits(["addToScore"]);
@@ -148,7 +147,6 @@ const props = defineProps({
     task: {},
 });
 
-
 var togglePopup = ref(false);
 
 var flaggedForDeletion = ref(false);
@@ -156,7 +154,6 @@ var flaggedForCompletion = ref(false);
 
 async function saveTask() {
     // TODO update all tasks of this category.
-
 
     // TODO: only works for categories! It is nesessary to build a payload!
     if (store.taskModified) {
@@ -175,7 +172,7 @@ async function saveTask() {
 async function addCategory(category) {
     store.taskModified = true;
 
-    console.log(category)
+    console.log(category);
     //asdf
 
     props.task.categories.push(category);
@@ -213,9 +210,9 @@ async function closeSelectablePopup(selectable) {
 async function deleteTask(task) {
     flaggedForDeletion.value = !flaggedForDeletion.value;
 
-    if(flaggedForDeletion.value){
+    if (flaggedForDeletion.value) {
         setTimeout(async () => {
-            if(flaggedForDeletion.value){
+            if (flaggedForDeletion.value) {
                 const answer = await store.deleteTask(task._id);
                 if (answer) emit("addToScore", 5);
             }
@@ -223,20 +220,18 @@ async function deleteTask(task) {
     }
 }
 
-
 async function completeTask(task) {
     flaggedForCompletion.value = !flaggedForCompletion.value;
 
-    if(flaggedForCompletion.value){
+    if (flaggedForCompletion.value) {
         setTimeout(async () => {
-            if(flaggedForCompletion.value){
+            if (flaggedForCompletion.value) {
                 const answer = await store.completeTask(task._id);
                 if (answer) emit("addToScore", 20);
             }
         }, 700);
     }
 }
-
 </script>
 <style>
 .input-label {
@@ -246,26 +241,13 @@ async function completeTask(task) {
     color: gray;
 }
 
-input[type="text"],
-input[type="datetime-local"],
-input[type="number"],
-input[type="radio"] {
-    width: 100%;
-    padding: 12px 20px;
-    margin: 8px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-.actionPending{
+.actionPending {
     transition: 0.6s;
     filter: brightness(0.9);
     -webkit-filter: brightness(0.9);
 }
 
-.actionPending:after{
+.actionPending:after {
     transition: 0.6s;
     filter: brightness(0.9);
     -webkit-filter: brightness(0.9);
@@ -276,8 +258,6 @@ input[type="radio"] {
     filter: brightness(0.8);
     -webkit-filter: brightness(0.8);
 }
-
-
 
 .add-btn-container {
     margin: 25px 0 0 0;
@@ -290,25 +270,5 @@ input[type="radio"] {
 
 .button-space {
     margin-left: 5px;
-}
-
-.task-preview {
-    background-color: #f0f0f0;
-    margin-bottom: 10px;
-}
-
-.task-preview:hover {
-    background-color: #f5f5f5;
-    transition: filter 0.2s;
-}
-
-.header > h2 {
-    font-family: "Arial", "Helvetica", sans-serif;
-    font-size: 19px;
-    font-weight: 500;
-    color: #676767;
-    text-align: left;
-    overflow-wrap: break-word;
-    word-break: break-word;
 }
 </style>

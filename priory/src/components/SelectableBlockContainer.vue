@@ -10,12 +10,12 @@
         >
             <label class="input-label" for="title"
                 >{{ buildingBlock.title }}:
-                <textarea
-                    v-model="buildingBlock.value.text" editorStyle="height: 320px" class="input-field" id="title"
-                >
-                    
-                </textarea>
+                <RichTextEditor 
+                    :buildingBlock="buildingBlock"
+                    @update-rich-text="updateBuildingBlockValue"
+                />
             </label>
+
         </div>
 
         <div
@@ -25,7 +25,7 @@
             <label class="input-label" for="title"
                 >{{ buildingBlock.title }}:
                 <div
-                    v-for="(todo, todoIndex) in buildingBlock.value.todos"
+                    v-for="(todo, todoIndex) in buildingBlock.value"
                     @click.prevent.stop="
                         () => {
                             todo.status = !todo.status;
@@ -49,7 +49,7 @@
                             v-if="mouseOverElement == todo.id"
                             @click="
                                 () => {
-                                    buildingBlock.value.todos.splice(
+                                    buildingBlock.value.splice(
                                         todoIndex,
                                         1,
                                     );
@@ -64,7 +64,7 @@
                 <form
                     @submit.prevent="
                         () => {
-                            buildingBlock.value.todos.push({
+                            buildingBlock.value.push({
                                 title: todoTmp,
                                 status: false,
                                 id: uuidv4(),
@@ -97,15 +97,32 @@ import { ref } from "vue";
 import { v4 as uuidv4 } from "uuid";
 
 import TrafficLight from "../components/buildingBlocks/TrafficLight.vue";
+import RichTextEditor from "../components/buildingBlocks/RichTextEditor.vue";
 
+// Store
+import { useTaskStore } from "../stores/store.js";
+import { useUiStore } from "../stores/uiStore";
+
+const store = useTaskStore();
+const uiStore = useUiStore();
+
+var todoTmp = ref("");
+var mouseOverElement = ref("");
 
 const props = defineProps({
     selectables: Array,
 });
 
+async function updateBuildingBlockValue(value, id){
 
-var todoTmp = ref("");
-var mouseOverElement = ref("");
+    console.log("Hlakshjdf")
+    const answer = await store.updateSelectableBlock(uiStore.ui.currentTask._id, id, value);
+
+    // TODO: Handle error
+}
+
+
+
 </script>
 <style>
 .sub-todo-entry {

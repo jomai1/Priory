@@ -39,8 +39,8 @@
 <script setup>
 import { ref, onMounted, watch, nextTick } from "vue";
 
-import { taskStore } from "../stores/store.js";
-const store = taskStore();
+import { useTaskStore } from "../stores/store.js";
+const store = useTaskStore();
 
 const emit = defineEmits(["removeCategory", "addCategory"]);
 const props = defineProps({
@@ -149,6 +149,7 @@ onMounted(async () => {
 }
 
 .category-input {
+	margin-left: 10px;
 	flex-wrap: wrap;
 	gap: 8px;
 }
@@ -166,7 +167,6 @@ onMounted(async () => {
 
 .category {
 	font-family: "Arial", "Helvetica", sans-serif;
-	color: #676767;
 	align-items: center;
 	margin: 0px 10px 10px 0px;
 	padding: 5px 10px;
