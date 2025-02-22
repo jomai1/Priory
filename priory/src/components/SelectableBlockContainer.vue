@@ -24,63 +24,12 @@
         >
             <label class="input-label" for="title"
                 >{{ buildingBlock.title }}:
-                <div
-                    v-for="(todo, todoIndex) in buildingBlock.value"
-                    @click.prevent.stop="
-                        () => {
-                            todo.status = !todo.status;
-                        }
-                    "
-                    @mouseover.prevent.stop="
-                        () => {
-                            mouseOverElement = todo.id;
-                        }
-                    "
-                    @mouseleave.prevent.stop="
-                        () => {
-                            mouseOverElement = '';
-                        }
-                    "
-                    class="sub-todo-entry"
-                >
-                    {{ todo.title }}
-                    <div>
-                        <button
-                            v-if="mouseOverElement == todo.id"
-                            @click="
-                                () => {
-                                    buildingBlock.value.splice(
-                                        todoIndex,
-                                        1,
-                                    );
-                                }
-                            "
-                        >
-                            ✖
-                        </button>
-                        <input type="checkbox" v-model="todo.status" />
-                    </div>
-                </div>
-                <form
-                    @submit.prevent="
-                        () => {
-                            buildingBlock.value.push({
-                                title: todoTmp,
-                                status: false,
-                                id: uuidv4(),
-                            });
-                            todoTmp = '';
-                        }
-                    "
-                >
-                    <input
-                        class="input-field"
-                        :placeholder="buildingBlock.placeholder"
-                        type="text"
-                        id="title"
-                        v-model="todoTmp"
-                    />
-                </form>
+
+                <TodoList
+                    :buildingBlock="buildingBlock"
+                    @update-todo="updateBuildingBlockValue"
+                />
+
             </label>
         </div>
 
@@ -94,10 +43,10 @@
 </template>
 <script setup>
 import { ref } from "vue";
-import { v4 as uuidv4 } from "uuid";
 
 import TrafficLight from "../components/buildingBlocks/TrafficLight.vue";
 import RichTextEditor from "../components/buildingBlocks/RichTextEditor.vue";
+import TodoList from "../components/buildingBlocks/TodoList.vue";
 
 // Store
 import { useTaskStore } from "../stores/store.js";
@@ -106,18 +55,13 @@ import { useUiStore } from "../stores/uiStore";
 const store = useTaskStore();
 const uiStore = useUiStore();
 
-var todoTmp = ref("");
-var mouseOverElement = ref("");
 
 const props = defineProps({
     selectables: Array,
 });
 
 async function updateBuildingBlockValue(value, id){
-
-    console.log("Hlakshjdf")
     const answer = await store.updateSelectableBlock(uiStore.ui.currentTask._id, id, value);
-
     // TODO: Handle error
 }
 
@@ -125,27 +69,5 @@ async function updateBuildingBlockValue(value, id){
 
 </script>
 <style>
-.sub-todo-entry {
-    display: flex;
-    justify-content: space-between;
-    padding: 5px 10px 5px 10px;
-    margin: 5px 10px 5px 10px;
-    border-radius: 4px;
-    background-color: #f5f5f5;
-    cursor: pointer;
-}
 
-.sub-todo-entry button {
-    background-color: transparent;
-    /* Optional: Transparent background */
-    border: none;
-    /* Remove button border */
-    cursor: pointer;
-    color: #ff5c5c;
-    /* Optional: Set a delete color */
-}
-
-.sub-todo-entry input[type="checkbox"] {
-    cursor: pointer;
-}
 </style>

@@ -78,6 +78,7 @@ export const useTaskStore = defineStore('tasks', {
                 })
 
             } catch (error) {
+                console.log(error.response);
                 return false
             }
 
@@ -113,6 +114,7 @@ export const useTaskStore = defineStore('tasks', {
                 return tasks_req.success
 
             } catch (error) {
+                console.log(error.response);
                 this.tasks = backup
                 return false
             }
@@ -150,6 +152,7 @@ export const useTaskStore = defineStore('tasks', {
                 return tasks_req.success
 
             } catch (error) {
+                console.log(error.response);
                 this.tasks = backup
                 return false
             }
@@ -185,6 +188,7 @@ export const useTaskStore = defineStore('tasks', {
                 return tasks_req.success
 
             } catch (error) {
+                console.log(error.response);
                 this.tasks = backup
                 return false
             }
@@ -204,6 +208,7 @@ export const useTaskStore = defineStore('tasks', {
                 return tasks_req.success
 
             } catch (error) {
+                console.log(error.response);
                 this.tasks = backup
                 return false
             }
@@ -223,6 +228,7 @@ export const useTaskStore = defineStore('tasks', {
                 return tasks_req.success
 
             } catch (error) {
+                console.log(error.response);
                 this.tasks = backup
                 return false
             }

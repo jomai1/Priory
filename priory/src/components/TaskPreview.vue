@@ -54,7 +54,7 @@
                 @add-category="addCategory"
             />
 
-            {{ task }}
+            <!-- {{ task }} -->
 
             <SelectableBlockContainer :selectables="task.ticketBlocks" />
             <div
@@ -73,10 +73,12 @@
                 </button>
             </div>
         </div>
-        <div class="footer">
+        <div 
+            class="footer"
+            :class="{visible: uiStore.getUiState.hoverID == task._id, hidden: !(uiStore.getUiState.hoverID == task._id)}"
+        >
             <div
                 @click.prevent.stop
-                v-if="uiStore.getUiState.hoverID == task._id"
             >
                 <button
                     v-show="uiStore.getUiState.editID == task._id"
@@ -263,6 +265,17 @@ async function completeTask(task) {
     margin: 25px 0 0 0;
     text-align: center;
 }
+
+.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.visible {
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out;
+}
+
+
 
 .submit-btn-container {
     text-align: right;

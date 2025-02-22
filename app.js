@@ -16,6 +16,7 @@ import readTask from "./api/v1/routes/readTask.js";
 // Update
 import updateTask from "./api/v1/routes/updateTask.js";
 import updateTasks from "./api/v1/routes/updateTasks.js";
+import updateSelectableBlock from "./api/v1/routes/updateSelectableBlock.js";
 
 // Delete (and flagging)
 import deleteTask from "./api/v1/routes/deleteTask.js";
@@ -44,11 +45,13 @@ app.use('/api/v1/', readTask)
 app.use('/api/v1/', readTasks)
 app.use('/api/v1/', updateTask)
 app.use('/api/v1/', updateTasks)
+app.use('/api/v1/', updateSelectableBlock)
 app.use('/api/v1/', deleteTask)
 app.use('/api/v1/', softDeleteTask)
 app.use('/api/v1/', archiveTask)
 app.use('/api/v1/', restoreTask)
 app.use('/api/v1/', completeTask)
+
 
 
 mongoose.connect(process.env.DB_CONNECTION)

@@ -21,6 +21,10 @@
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
 
   --vt-c-text-grey-1: rgba(116, 116, 116, 0.90);
+  
+  --color-light-background-1: rgba(225, 225, 225, 0.90);
+  --color-light-background-2: rgba(235, 235, 235, 0.90);
+
 }
 
 /* semantic color variables for this project */

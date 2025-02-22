@@ -22,7 +22,7 @@
 				<input
 				v-if="edit && isAddingCategory"
 				v-model="newCategory"
-	      class="category-input-field input"
+	      class="category-input-field input input-base"
 	      @blur="addCategory"
 	      @keyup.enter="addCategory(newCategory)"
 	      placeholder="New category..."
