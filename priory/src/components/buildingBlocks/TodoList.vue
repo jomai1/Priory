@@ -1,55 +1,59 @@
 <template>
-    <div
-        v-for="(todo, todoIndex) in buildingBlock.value"
-        @click.prevent.stop="toggleTodoStatus(todo._id)"
-        @mousedown="console.log('Mouse down')"
-        @mouseup="console.log('Mouse up')"
-        @mouseover.prevent.stop="
-            () => {
-                mouseOverElement = todo._id;
-            }
-        "
-        @mouseleave.prevent.stop="
-            () => {
-                mouseOverElement = '';
-            }
-        "
-        class="sub-todo-entry"
-    >
-        <form @submit.prevent="changeTodoTitle(todo, todoIndex)">
-            <input
-                class="todo-title"
-                type="text"
-                v-model="todo.title"
-                ref="todoInputsRef"
-                @click.stop="changeSizeOfInput(todoIndex)"
-                @input="
-                    () => {
-                        changeSizeOfInput(todoIndex);
-                        addWarnMessage(todoIndex);
-                    }
-                "
-            />
-        </form>
+    <div 
+        class="sub-todo-conatiner"
+    >   
+        <div
+            v-for="(todo, todoIndex) in buildingBlock.value"
+            :key="todo._id"
+            class="sub-todo-entry"
+            @click.prevent.stop="toggleTodoStatus(todo._id)"
+            @mouseover.prevent.stop="
+                () => {
+                    mouseOverElement = todo._id;
+                }
+            "
+            @mouseleave.prevent.stop="
+                () => {
+                    mouseOverElement = '';
+                }
+            "
+            
+        >
+            <form @submit.prevent="changeTodoTitle(todo, todoIndex)">
+                <input
+                    class="todo-title"
+                    type="text"
+                    v-model="todo.title"
+                    ref="todoInputsRef"
+                    @click.stop="changeSizeOfInput(todoIndex)"
+                    @input="
+                        () => {
+                            changeSizeOfInput(todoIndex);
+                            addWarnMessage(todoIndex);
+                        }
+                    "
+                />
+            </form>
 
-        <div>
-            <button
-                v-if="mouseOverElement == todo._id"
-                @click.prevent.stop="deleteTodo(todoIndex)"
-            >
-                ✖
-            </button>
-            <input type="checkbox" :checked="todo.status" @click.stop />
+            <div class="action-buttons-container">
+                <button
+                    v-if="mouseOverElement == todo._id"
+                    @click.prevent.stop="deleteTodo(todoIndex)"
+                >
+                    ✖
+                </button>
+                <input type="checkbox" :checked="todo.status" @click.stop />
+            </div>
         </div>
     </div>
     <form @submit.prevent="addTodo()">
-        <input
-            class="input-field input-base"
-            :placeholder="buildingBlock.placeholder"
-            type="text"
-            v-model="todoTmp"
-        />
-    </form>
+            <input
+                class="input-field input-base"
+                :placeholder="buildingBlock.placeholder"
+                type="text"
+                v-model="todoTmp"
+            />
+        </form>
 </template>
 
 <script setup>
@@ -74,7 +78,6 @@ const minInputSize = 10;
 var todoTmp = ref("");
 var mouseOverElement = ref("");
 const warnMessageElements = ref([]);
-
 
 function toggleTodoStatus(todoId) {
     var tmpTodos = props.buildingBlock.value;
@@ -154,17 +157,23 @@ function resizeInputRef(index) {
 }
 
 function removeWarnMessage(index) {
+
     if (todoInputsRefs.value[index] && warnMessageElements.value[index]) {
+
+        if(!todoInputsRefs.value[index].parentElement.contains(warnMessageElements.value[index])) return;
+
         todoInputsRefs.value[index].parentElement.removeChild(
-            warnMessageElements.value[index],
+            warnMessageElements.value[index]
         );
+
         todoInputsRefs.value[index].classList.remove("warning");
+        warnMessageElements.value.splice(index, 1);
     }
 }
 
 function addWarnMessage(index) {
-    if (!todoInputsRefs.value[index] || !props.buildingBlock.value[index])
-        return;
+    if (!todoInputsRefs.value[index] || !props.buildingBlock.value[index]) return;
+        
     if (todoInputsRefs.value[index].parentElement.querySelector("p")) return;
 
     const p = document.createElement("p");
@@ -195,6 +204,33 @@ onUnmounted(() => {
 </script>
 
 <style>
+
+.action-buttons-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.action-buttons-container button{
+    background-color: transparent;
+    border: none;
+    color: #ff5c5c; 
+    padding: 10px 8px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.action-buttons-container button:hover {
+    transform: scale(1.1);
+    transition: 0.5s ease-in-out;
+    filter: brightness(1.05);
+    -webkit-filter: brightness(1.05);
+}
+
+.action-buttons-container input{
+    padding: 10px 5px;
+}
+
 .todo-title {
     border: none;
     background: none;
@@ -220,7 +256,6 @@ onUnmounted(() => {
 .todo-title:focus {
     outline: none;
     box-shadow: 0 0 8px rgba(137, 196, 244, 0.6);
-    transform: scale(1.02);
 }
 
 .warning:focus {
@@ -230,7 +265,7 @@ onUnmounted(() => {
 .sub-todo-entry {
     display: flex;
     justify-content: space-between;
-    padding: 5px 10px 5px 10px;
+    padding: 5px 15px 5px 10px;
     margin: 5px 10px 5px 10px;
     border-radius: 4px;
     background-color: var(--color-light-background-1);
@@ -240,13 +275,7 @@ onUnmounted(() => {
 .sub-todo-entry:hover {
     filter: brightness(1.05);
     -webkit-filter: brightness(1.05);
-}
-
-.sub-todo-entry button {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    color: #ff5c5c;
+    transition: 0.1s ease-in-out;
 }
 
 .sub-todo-entry input[type="checkbox"] {
