@@ -11,13 +11,24 @@
         "
     >
         <div class="header">
-            <h2>{{ task.title }}</h2>
+            <CustomInput
+                :text="task.title"
+                :class="'title'"
+                :placeholder="'Enter title'"
+                @update-custom-input="changeTitle"
+            />
             <button
-                v-if="
-                    uiStore.getUiState.currentTask._id == task._id &&
-                    uiStore.getUiState.hoverID == task._id &&
-                    uiStore.getUiState.editID != task._id
-                "
+                :class="{
+                    visible:
+                        uiStore.getUiState.currentTask._id == task._id &&
+                        uiStore.getUiState.hoverID == task._id &&
+                        uiStore.getUiState.editID != task._id,
+                    hidden: !(
+                        uiStore.getUiState.currentTask._id == task._id &&
+                        uiStore.getUiState.hoverID == task._id &&
+                        uiStore.getUiState.editID != task._id
+                    ),
+                }"
                 class="btn edit-btn button-space"
                 @click.prevent.stop="
                     () => {
@@ -54,7 +65,7 @@
                 @add-category="addCategory"
             />
 
-            <!-- {{ task }} -->
+            {{ task }}
 
             <SelectableBlockContainer :selectables="task.ticketBlocks" />
             <div
@@ -73,13 +84,14 @@
                 </button>
             </div>
         </div>
-        <div 
+        <div
             class="footer"
-            :class="{visible: uiStore.getUiState.hoverID == task._id, hidden: !(uiStore.getUiState.hoverID == task._id)}"
+            :class="{
+                visible: uiStore.getUiState.hoverID == task._id,
+                hidden: !(uiStore.getUiState.hoverID == task._id),
+            }"
         >
-            <div
-                @click.prevent.stop
-            >
+            <div @click.prevent.stop>
                 <button
                     v-show="uiStore.getUiState.editID == task._id"
                     class="btn edit-btn button-space"
@@ -135,6 +147,7 @@ import { ref, watch } from "vue";
 import SelectableBlockContainer from "../components/SelectableBlockContainer.vue";
 import SelectablePopup from "../components/SelectablePopup.vue";
 import CategoryInput from "../components/CategoryInput.vue";
+import CustomInput from "../components/buildingBlocks/CustomInput.vue";
 
 // Store
 import { useTaskStore } from "../stores/store.js";
@@ -146,46 +159,38 @@ const uiStore = useUiStore();
 const emit = defineEmits(["addToScore"]);
 
 const props = defineProps({
-    task: {},
+    taskProp: {},
 });
+
+const task = ref({...props.taskProp});
 
 var togglePopup = ref(false);
 
 var flaggedForDeletion = ref(false);
 var flaggedForCompletion = ref(false);
 
-async function saveTask() {
-    // TODO update all tasks of this category.
-
-    // TODO: only works for categories! It is nesessary to build a payload!
-    if (store.taskModified) {
-        // if only one task was modified, only modify this one!
-
-        const answer = await store.updateTask(props.task._id, {
-            categories: JSON.parse(JSON.stringify(props.task.categories)),
-        });
-
-        if (answer) emit("addToScore", 1);
+async function changeTitle(title) {
+    if(title != ''){
+        const answer = await store.updateTask(task.value._id, {
+            title: JSON.parse(JSON.stringify(title))
+        });    
+    }else{
+        return;
     }
-
-    uiStore.changeTask(props.task);
+    
 }
 
-async function addCategory(category) {
-    store.taskModified = true;
+function addCategory(category) {
+    // Todo: Cannot input Today into category. Probably is because of the store but dont know.
+    console.log(category)
 
-    console.log(category);
-    //asdf
-
-    props.task.categories.push(category);
+    task.value.categories.push(category);
 }
 
 function removeCategory(category) {
-    store.taskModified = true;
+    const index = task.value.categories.findIndex((cat) => cat == category);
 
-    const index = props.task.categories.findIndex((cat) => cat == category);
-
-    var tmpTask = props.task.categories;
+    var tmpTask = task.value.categories;
     tmpTask.splice(index, 1);
 }
 
@@ -193,20 +198,32 @@ async function closeSelectablePopup(selectable) {
     togglePopup.value = false;
 
     if (Object.keys(selectable).length !== 0) {
-        const payload = props.task;
+        const payload = task.value;
         payload.ticketBlocks.push(selectable);
 
-        const answer = await store.updateTask(props.task._id, {
+        const answer = await store.updateTask(task.value._id, {
             ticketBlocks: payload.ticketBlocks,
         });
 
-        uiStore.changeTask(props.task);
-
-        console.log(`Updated task`);
-        console.log(props.task);
+        uiStore.changeTask(task.value.value);
 
         if (answer) emit("addToScore", 1);
     }
+}
+
+async function saveTask() {
+    // TODO update all tasks of this category.
+
+    // TODO: only works for categories! It is nesessary to build a payload!
+    // if only one task was modified, only modify this one!
+
+    const answer = await store.updateTask(task.value._id, {
+        categories: JSON.parse(JSON.stringify(task.value.categories)),
+    });
+
+    if (answer) emit("addToScore", 1);
+
+    uiStore.changeTask(task.value);
 }
 
 async function deleteTask(task) {
@@ -265,16 +282,6 @@ async function completeTask(task) {
     margin: 25px 0 0 0;
     text-align: center;
 }
-
-.hidden {
-    opacity: 0;
-    pointer-events: none;
-}
-.visible {
-    opacity: 1;
-    transition: opacity 0.2s ease-in-out;
-}
-
 
 
 .submit-btn-container {

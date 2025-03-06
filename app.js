@@ -24,6 +24,9 @@ import softDeleteTask from "./api/v1/routes/softDeleteTask.js";
 import archiveTask from "./api/v1/routes/archiveTask.js";
 import restoreTask from "./api/v1/routes/restoreTask.js";
 import completeTask from "./api/v1/routes/completeTask.js";
+import deleteSelectableBlock from "./api/v1/routes/deleteSelectableBlock.js";
+
+
 
 
 // Express server
@@ -51,6 +54,9 @@ app.use('/api/v1/', softDeleteTask)
 app.use('/api/v1/', archiveTask)
 app.use('/api/v1/', restoreTask)
 app.use('/api/v1/', completeTask)
+app.use('/api/v1/', deleteSelectableBlock)
+
+
 
 
 

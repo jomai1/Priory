@@ -48,8 +48,8 @@
     </div>
     <form @submit.prevent="addTodo()">
             <input
-                class="input-field input-base"
-                :placeholder="buildingBlock.placeholder"
+                class="todo-input"
+                :placeholder="'Add todo ...'"
                 type="text"
                 v-model="todoTmp"
             />
@@ -188,15 +188,21 @@ function addWarnMessage(index) {
 }
 
 onMounted(() => {
-    for (var i = 0; i < todoInputsRefs.value.length; i++) {
-        resizeInputRef(i);
+    if(todoInputsRefs.value){
+        for (var i = 0; i < todoInputsRefs.value.length; i++) {
+            resizeInputRef(i);
+        }    
     }
+    
 });
 
 onUnmounted(() => {
-    for (var i = 0; i < todoInputsRefs.value.length; i++) {
-        removeWarnMessage(i);
+    if(todoInputsRefs.value){
+        for (var i = 0; i < todoInputsRefs.value.length; i++) {
+            removeWarnMessage(i);
+        }    
     }
+    
 });
 
 

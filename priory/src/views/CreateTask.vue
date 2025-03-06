@@ -5,17 +5,12 @@
             <button class="close-btn" @click="closeCreateTask()">✖</button>
         </div>
         <div class="action-block">
-            <label class="input-label" for="title"
-                >Chose a title:
-                <input
-                    class="input-field"
-                    placeholder="Enter a title"
-                    type="text"
-                    id="title"
-                    v-model="title"
-                    ref="titleInputField"
-                />
-            </label>
+            <input
+                type="text"
+                v-model="title"
+                :class="'text-input'"
+                :placeholder="'Enter title ...'"
+            />    
         </div>
 
         <div class="action-block">
@@ -27,7 +22,7 @@
             />
         </div>
 
-        {{ ticketBlocks }}
+        <!-- {{ ticketBlocks }} -->
 
         <SelectableBlockContainer :selectables="ticketBlocks" />
         <div class="add-btn-container">
@@ -46,6 +41,7 @@
             <button class="btn" @click="submitTask()">submit</button>
         </div>
     </div>
+
     <SelectablePopup
         :visible="togglePopup"
         @close-popup="closeSelectablePopup"
@@ -55,16 +51,18 @@
 import SelectablePopup from "../components/SelectablePopup.vue";
 import SelectableBlockContainer from "../components/SelectableBlockContainer.vue";
 import CategoryInput from "../components/CategoryInput.vue";
+import CustomInput from "../components/buildingBlocks/CustomInput.vue";
 
 import { useRouter, useRoute } from "vue-router";
 import { useTaskStore } from "../stores/store.js";
-import { ref, onMounted } from "vue";
+import { useUiStore } from "../stores/uiStore";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 
 const router = useRouter();
 const route = useRoute();
 const store = useTaskStore();
+const uiStore = useUiStore();
 
-const titleInputField = ref(null);
 var togglePopup = ref(false);
 var title;
 var categories = ref(
@@ -78,12 +76,27 @@ var prioScoreSystem = ref(0);
 // prio score the user assigned
 var prioScore = ref(0);
 
+
+function removeStringFromArray(arr, str) {
+    // Todo add error handling
+    if (!arr.includes(str)) {
+        return arr;
+    }
+
+    const index = arr.indexOf(str);
+    if (index > -1) {
+        arr.splice(index, 1);
+    }
+
+    return arr;
+}
+
 function addCategory(category) {
     categories.value.push(category);
 }
 
-function removeCategory(index) {
-    categories.value.splice(index, 1);
+function removeCategory(category) {
+    categories.value = removeStringFromArray(categories.value, category);
 }
 
 function closeCreateTask() {
@@ -119,16 +132,14 @@ async function submitTask() {
 }
 
 onMounted(async () => {
-    titleInputField.value.focus();
+    uiStore.setCreateMode(true);
+});
+
+onBeforeUnmount(() => {
+    uiStore.setCreateMode(false);
 });
 </script>
 <style>
-.input-label {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
 .add-btn-container {
     margin: 25px 0 0 0;
     text-align: center;

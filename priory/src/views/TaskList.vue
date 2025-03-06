@@ -17,7 +17,6 @@
                     @click="uiStore.increaseCategoryIndex(store.allCategories)"
                 >></button>
             </div>
-
             <button
                 class="btn add-btn"
                 @click="
@@ -35,7 +34,7 @@
         <!--       <div class="score-container">
                 <p class="score">{{ tweened.score.toFixed(0) }}</p>
             </div> -->
-        <div v-if="allTasks.length == 0" class="delete-category-container">
+        <div v-if="allTasks.length == 0 && uiStore.getUiState.category != 'Today'" class="delete-category-container">
             <button
                 class="btn delete-btn"
                 @click="
@@ -54,7 +53,7 @@
             @mouseover.stop.prevent="hoverOverTask(task)"
             :ref="setTaskRef"
         >
-            <TaskPreview :task="task" @add-to-score="addToScore" />
+            <TaskPreview :taskProp="task" @add-to-score="addToScore" />
         </div>
     </div>
 </template>

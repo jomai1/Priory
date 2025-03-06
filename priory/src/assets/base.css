@@ -25,6 +25,8 @@
   --color-light-background-1: rgba(225, 225, 225, 0.90);
   --color-light-background-2: rgba(235, 235, 235, 0.90);
 
+  --vt-c-border-light-1: rgba(60, 60, 60, 0.12);
+
 }
 
 /* semantic color variables for this project */
@@ -59,7 +61,6 @@
 body {
   min-height: 100vh;
   color: rgba(203, 202, 201, 0.64);
-  
   
   transition:
     color 0.5s,

@@ -9,6 +9,7 @@ export const useUiStore = defineStore("uiStore", {
             hoverID: 0,
             editID: 0,
             taskPreviewRef: '',
+            createTask: false,
             mouseEvent: {
                 isDragging: false,
                 startX: 0,
@@ -20,6 +21,17 @@ export const useUiStore = defineStore("uiStore", {
         getUiState: (state) => {
             return state.ui;
         },
+        isEdit: (state) => {
+            if(state.ui.editID == state.ui.currentTask._id) return true;
+            return false;
+        },
+        isHover: (state) => {
+            if(state.ui.hoverID == state.ui.currentTask._id) return true;
+            return false;
+        },
+        isInCreateMode: (state) => {
+            return state.ui.createTask;
+        }
 
     },
     actions: {
@@ -30,6 +42,9 @@ export const useUiStore = defineStore("uiStore", {
             if(this.ui.mouseEvent.isDragging) return
 
             this.ui.editID = id;
+        },
+        setCreateMode(boolToggleMode){
+            this.ui.createTask = boolToggleMode;
         },
         changeTask(task) {
             if(this.ui.mouseEvent.isDragging) return

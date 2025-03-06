@@ -50,13 +50,31 @@ a,
   margin: 15px 0px 25px 0px;
 }
 
-.header > h2 {
+.small-header{
+  display: flex;
+  justify-content: space-between;
+  padding: 0px 5px;
+}
+
+.title{
     font-family: "Arial", "Helvetica", sans-serif;
     font-size: 19px;
     font-weight: 500;
     text-align: left;
     overflow-wrap: break-word;
     word-break: break-word;
+    border: none;
+    p{
+      margin: 0px;
+    }
+}
+
+.active-title-input{
+  cursor: text;
+}
+
+.disabled-title-input{
+  cursor: default;
 }
 
 .container{
@@ -226,6 +244,12 @@ a,
   -webkit-filter: brightness(1.1);
 }
 
+.building-block{
+  padding: 5px;
+  border: 1px solid var(--vt-c-border-light-1);
+  border-radius: 15px;
+}
+
 .switch-category-btn{
   background-color: #f0f0f0;
   color: var(--vt-c-text-grey-1);
@@ -273,10 +297,25 @@ a,
   background: none;
 }
 
+
+.delete-selectable-btn{
+  color: var(--vt-c-text-grey-1);
+}
+
 .action-block{
-  margin-top: 10px;
-  margin-bottom: 10px;
   padding: 10px;
+}
+
+.todo-input{
+  box-sizing: border-box;
+  width: 100%;
+  background-color: white;
+  padding: 10px;
+  border: 1px solid var(--vt-c-border-light-1);
+  border-radius: 15px;
+  cursor: text;
+  margin-top: 10px;
+  font-size: 15px;
 }
 
 hr.solid-divider {
@@ -288,29 +327,39 @@ hr.solid-divider {
   width: 100%;
 }
 
-textarea {
-  width: 100%;
-  resize: vertical;
-  min-height: 40px;
-  padding: 12px 20px;
-  margin: 8px 0;
-  display: inline-block;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
+
+.text-input{
+  background-color: white;
+  padding: 10px;
+  border-radius: 15px;
+  cursor: text;
+  width: 96%;
+  border: 1px solid var(--vt-c-border-light-1);
+  font-size: 1.35em;
 }
 
+.custom-rich-text-editor {
+    min-height: 50px;
+     background-color: white;
+    padding: 10px;
+    border-radius: 15px;
+    cursor: text;
+    width: 96%;
+    border: 1px solid var(--vt-c-border-light-1);
+    font-size: 1em;
+    
+    p{
+      margin: 0px;
+    }
 
-.input-base{
-    width: 100%;
-    padding: 12px 20px;
-    margin: 8px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
+    code {
+        background-color: var(--purple-light);
+        border-radius: 0.4rem;
+        color: var(--black);
+        font-size: 0.85rem;
+        padding: 0.25em 0.3em;
+    }
 }
-
 
 .warning-message {
     color: red;
@@ -334,4 +383,15 @@ textarea {
 .warning-message::before {
     content: "⚠️";
     font-size: 16px;
+}
+
+.hidden {
+    transition: 0s;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+.visible {
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out;
 }
